@@ -1,0 +1,110 @@
+body,
+html,
+nav,
+main {
+  height: 100%;
+}
+* {
+  box-sizing:border-box;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  background-color: rgb(40, 40, 40);
+  font-family: 'Roboto', arial;
+  color: rgb(241, 241, 241);
+}
+
+.row {
+    display: flex;
+    flex: 1;
+  }
+  
+.frame{
+    display:flex;
+    flex-direction: row;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+    background-color: rgb(139, 139, 139);
+    border: .25vh solid #2b2b2b;
+}
+/* nav styling and behaviors*/
+.nav-line {
+    display: flex;
+    flex-direction: column;
+    width: 15vw;
+    height: 100%;
+    background-color: rgb(170, 170, 170);
+    border-right: .25vh solid #2b2b2b;
+}
+
+.nav-block {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    width: auto;
+    height: fit-content;
+    padding: 2vh;
+    color: black;
+    font-size: large;
+    border-bottom: .25vh solid #2b2b2b;
+}
+
+.nav-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 100%;
+    border: 1px solid black;
+    background-color: aqua;
+}
+
+.nav-dropdown {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    height: auto;
+    padding: 1vh;
+    color: black;
+    border-bottom: .25vh solid #2b2b2b;
+}
+
+.nav-dropdown-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 100%;
+    align-self: flex-end;
+    padding:1vh;
+}
+
+/* user custom display options */
+
+#schoolBlock {
+    background-color: beige;
+}
+
+#teacherBlock {
+    justify-content: none;
+    align-items: none;
+}
+
+.user-label {
+    justify-self: flex-start;
+    align-self: flex-start;
+}
+
+#gradebookLabel {
+    display: flex;
+}
+
+/* gradebook nav generation styles */
+.gradebook {
+    display: flex;
+    flex-direction: column;
+}
+

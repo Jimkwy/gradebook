@@ -1,0 +1,27 @@
+{% extends "app/layout.html" %}
+
+{% block body %}
+
+    <h2  style="color:rgb(102,255,102);"">Login</h2>
+    <hr>
+
+    {% if message %}
+        <div>{{ message }}</div>
+    {% endif %}
+
+    <form action="{% url 'login' %}" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <input class="input" type="text" name="username" placeholder="Enter username">
+        </div>
+        <hr>
+        <div class="form-group">
+            <input class="input" type="password" name="password" placeholder="Password">
+        </div>
+        <hr>
+        <input class="button" type="submit" value="Login">
+    </form>
+
+    <p style="color:rgb(102,255,102);">Don't have an account? <a href="{% url 'register' %}">Register here.</a></p>
+
+{% endblock %}
