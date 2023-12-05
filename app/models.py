@@ -24,15 +24,7 @@ class School(models.Model):
     phone = models.CharField(max_length=32, null=False)
     timestamp = models.DateTimeField(auto_now_add=True)
 
-    def serializer(self):
-        return {
-            "id": self.id,
-            "admin": self.admin,
-            "name": self.name,
-            "altName": self.altName,
-            "address": self.address,
-            "phone": self.phone
-        }
+    objects = models.Manager()
     def __str__(self):
         return f"{self.name}"
 
@@ -74,13 +66,13 @@ class Course(models.Model):
     subject = models.CharField(max_length=128, null=False, blank=False) #name of class
     code = models.CharField(max_length=128, null=True, blank=True)
     level = models.PositiveIntegerField(default=1)
-    year = models.CharField(max_length=12, blank=False)
+    year = models.CharField(max_length=12, blank=True)
     description = models.TextField(max_length=512, blank=True, null=True)
     start_time = models.TimeField(null=False, blank=True, default='0:0:0')
     end_time = models.TimeField(null=False, blank=True, default='0:0:0')
     timestamp = models.DateTimeField(auto_now_add=True)
 
-    teacher = models.ForeignKey('Teacher', on_delete=models.CASCADE, related_name='course', null=True)
+    teacher = models.ForeignKey('User', on_delete=models.CASCADE, related_name='course', null=True, blank=True)
     #course = models.ForeignKey('Course', on_delete=models.CASCADE, related_name='teacher', null=False)
     startDate = models.DateField(auto_now_add=False, null=True, blank=True)
     endDate = models.DateField(auto_now_add=False, null=True, blank=True)

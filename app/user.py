@@ -10,6 +10,9 @@ class User(AbstractUser):
     social = models.CharField(max_length=64, blank=True, null=True) #for use with other contact servicers such as LINE, MESSENGER or WHATSAPP
     code = models.CharField(max_length=64, blank=True, null=True) #if they have a school ID or other form of required identifier.
     timestamp = models.DateTimeField(auto_now_add=True)
+    is_admin = models.BooleanField(default=True)
+    is_teacher = models.BooleanField(default=True)
+    is_parent = models.BooleanField(default=False)
     pass
 
     def serializer(self):

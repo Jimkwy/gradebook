@@ -17,7 +17,17 @@ from .models import School, Teacher, Course, Student, StudentCourse, Attendance,
 def index(request):
     # Authenticated users can compse and view ideas
     if request.user.is_authenticated:
-        return render(request, "app/index.html")
+        user = request.user
+
+        school = School.objects.filter(id=user.school_id)
+
+        print(school.name)
+
+        classes = Course.objects.filter(teacher=user.id)
+
+        return render(request, "app/index.html", {'user': user,
+                                                  'school': school,
+                                                  'classes': classes})
 
     # Otherwise redirect to sign-in
     else:
