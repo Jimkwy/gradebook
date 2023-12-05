@@ -22,16 +22,18 @@
                 </div>
                 <div class="nav-block" id="teacherBlock">
                     <div class="user-label"></div>
-                    <div>{{ user.First_name }}{{user.Last_name}}</div>
+                    <div>{{ user.first_name }} {{user.last_name}}</div>
                 </div>
                 <div class="gradeook">
-                    <div class="nav-block" id="gradebookLabel">gradebook</div>
-                    <div class="nav-block" id="nav-dropdown">Classes <div class="arrow"></div></div>
-                    <div class="nav-dropdown" id="classes">
-                        {% for class in classes %}
-                        <a href="#" class="nav-dropdown-item">{{ class.code }}{{ class.subject }}</a>
-                        {% endfor %}
+                    <div class="nav-block" id="nav-dropdown">Classes <div class="arrow">
+                        <div class="nav-dropdown" id="classes">
+                            {% for class in classes %}
+                            <a href="" class="nav-dropdown-item">{{ class.code }}{{ class.subject }}</a>
+                            {% endfor %}
+                        </div>
                     </div>
+                </div>
+                    
                     <a class="button" href="{% url 'logout' %}">Log Out</a>
                 </div>
                 <div class="home"></div>

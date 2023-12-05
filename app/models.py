@@ -16,7 +16,7 @@ from .user import User
 class School(models.Model):
     #DELETE if ADMIN / FOUNDER account is deleted
     admin = models.ForeignKey('User', on_delete=models.CASCADE, related_name='created_school', null=False)
-    name = models.CharField(max_length=128, null=False)
+    name = models.CharField("name", max_length=128, null=False)
     altName = models.CharField(max_length=128, blank=True, null=True) #for non-english schools
     address = models.CharField(max_length=512, blank=True, null=True)
     #logo = models.ImageField('Image', upload_to='images/', blank=True, null=True)
@@ -133,7 +133,7 @@ class StudentCourse(models.Model):
     status = models.BooleanField(default=True, null=False)
 
     def __str__(self):
-        return f"{self.course}"
+        return f"{self.course, self.student}"
 
 #model for student attendance w/ student id, date, event id
 #child of student models

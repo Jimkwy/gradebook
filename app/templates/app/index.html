@@ -6,6 +6,26 @@
 {% endblock title %}
 {% block body %}
 <body>
-    
+    <div id="home">
+        {% if school %}
+            <div>Welcome {{ user.first_name}} {{ user.last_name}}</div>
+        {% else %}
+            <div>Please join or create a school</div>
+            
+            <a class="button">Join School</a><a class="button">Create New School</a>
+            <div id="new_school">
+
+            </div>
+            <div id="join_school">
+
+            </div>
+        {% endif %}
+    </div>
+    <div id="class_view">
+
+    </div>
+    <div id="">
+
+    </div>
 </body>
 {% endblock %}

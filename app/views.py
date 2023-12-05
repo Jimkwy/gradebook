@@ -19,14 +19,12 @@ def index(request):
     if request.user.is_authenticated:
         user = request.user
 
-        school = School.objects.filter(id=user.school_id)
-
-        print(school.name)
+        school = user.school
 
         classes = Course.objects.filter(teacher=user.id)
 
         return render(request, "app/index.html", {'user': user,
-                                                  'school': school,
+                                        
                                                   'classes': classes})
 
     # Otherwise redirect to sign-in
