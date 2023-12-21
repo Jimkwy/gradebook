@@ -9,7 +9,7 @@
         <div>{{ message }}</div>
     {% endif %}
 
-    <form action="{% url 'login' %}" method="post">
+    <form action="{% url 'login' %}" method="POST">
         {% csrf_token %}
         <div class="form-group">
             <input class="input" type="text" name="username" placeholder="Enter username">

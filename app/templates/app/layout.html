@@ -18,25 +18,27 @@
             <div class="nav-line" id="nav-line">
                 <div class="nav-block" id="schoolBlock">
                     <div class="nav-img"></div>
-                    <div>{{ school.name }}</div>
+                    <div>{{ user.school.name }}</div>
                 </div>
                 <div class="nav-block" id="teacherBlock">
                     <div class="user-label"></div>
                     <div>{{ user.first_name }} {{user.last_name}}</div>
                 </div>
                 <div class="gradeook">
-                    <div class="nav-block" id="nav-dropdown">Classes <div class="arrow">
-                        <div class="nav-dropdown" id="classes">
-                            {% for class in classes %}
-                            <a href="" class="nav-dropdown-item">{{ class.code }}{{ class.subject }}</a>
+                {% if user.school %}
+                    <div class="nav-block" id="nav-dropdown">courses <div class="arrow">
+                        <div class="nav-dropdown" id="courses">
+                            {% for copurse in courses %}
+                            <a href="" class="nav-dropdown-item">{{ course.code }}{{ course.subject }}</a>
                             {% endfor %}
                         </div>
+                        <button class="button" onclick="load_view('add_course')">Add New course</button>
                     </div>
                 </div>
-                    
-                    <a class="button" href="{% url 'logout' %}">Log Out</a>
+                <button class="button" onclick="load_view('settings')">Settings</button>
+                {% endif %}
+                <button class="button" href="{% url 'logout' %}">Log Out</button>
                 </div>
-                <div class="home"></div>
             </div>
         {% endif %}
             <main>

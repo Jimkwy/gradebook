@@ -1,0 +1,57 @@
+{% extends 'app/layout.html' %}
+{% load static %}
+
+{% block title %}
+<title>gradebook: School Setup</title>
+{% endblock title %}
+{% block body %}
+<body>
+        <h4>Are you joining an exsisting school?</h4>
+        <label>
+            <input type="radio" name="choice-radio" onclick="load_view('joinSchool')">
+            Yes
+        </label>
+        <label>
+            <input type="radio" name="choice-radio" onclick="load_view('newSchool')">
+            No
+        </label>
+        <hr>
+        <div id="joinSchool" class="view" style="display: none;">
+            <form id="join_form" method="POST">
+                <h4>Enter the schools private code to join.</h4>
+                <p><small>If you do not know your school's code, please ask your schools administration for access</small></p>
+                <div>
+                    <hr>
+                    <p><small>Please Use the access code sent to you by your school or organizations administration. If you ecounter any errors please contact your school administration or check out our FAQ.</small></p>
+                    <hr>
+                    <input required class="input" id="school_code" placeholder="Access code" form="join_form" name="code"></input>
+                </div>
+                <button class="button" onclick="load_view('welcome_view')">back</button>
+                <input id="submit" type="submit" class="button"/>
+            </form>
+        </div>
+        <div id="newSchool" class="view" style="display: none;">
+            <form id="newSchool_form" method="POST">
+                <h4>New School Submition</h4>
+                <small><i>*users (school admins) may only create one school per account</i></small>
+                <div>
+                    <h4>School Name: </h4>
+                    <hr>
+                    <input required class="input" id="school_name" placeholder="Shcool Name" form="newSchool_form">
+                </div>
+                <div>
+                    <h4>School Address:</h4>
+                    <hr>
+                    <input required class="input" id="school_address" placeholder="Address" form="newSchool_form"></input>
+                </div>
+                <div>
+                    <h4>School Phone Number:</h4>
+                    <hr>
+                    <input required class="input" id="school_phone" placeholder="Phone" form="newSchool_form"></input>
+                </div>
+                <button class="button" onclick="load_view('welcome_view')">back</button>
+                <input id="submit" type="submit" class="button"/>
+            </form>
+        </div>
+</body>
+{% endblock %}

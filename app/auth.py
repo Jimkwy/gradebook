@@ -21,6 +21,9 @@ def login_user(request):
             return render(request, "app/login.html", {
                 "message": "Invalid username and/or password."
             })
+    elif request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("index"))
+
     else:
         return render(request, "app/login.html")
 
@@ -34,6 +37,9 @@ def register(request):
     if request.method == "POST":
         username = request.POST["username"]
         email = request.POST["email"]
+        first_name = request.POST["first_name"]
+        last_name = request.POST["last_name"]
+        phone = request.POST["phone"]
 
         # Ensure password matches confirmation
         password = request.POST["password"]
@@ -46,6 +52,10 @@ def register(request):
         # Attempt to create new user
         try:
             user = User.objects.create_user(username, email, password)
+            user.first_name = first_name
+            user.last_name = last_name
+            user.phone = phone
+            
             user.save()
         except IntegrityError:
             return render(request, "app/register.html", {
@@ -53,5 +63,8 @@ def register(request):
             })
         login(request, user)
         return HttpResponseRedirect(reverse("index"))
+    elif request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("index"))
+
     else:
         return render(request, "app/register.html")
