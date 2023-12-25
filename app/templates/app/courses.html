@@ -1,0 +1,19 @@
+{% extends 'app/layout.html' %}
+{% load static %}
+
+{% block title %}
+<title>gradebook: courses</title>
+{% endblock title %}
+{% block body %}
+<body>
+    <div id="course_view">
+        {% if courses > 0 %}
+            {% for course in courses %}
+            <a >{{ course.code }}{{ course.subject }}</a>
+            {% endfor %}
+        {% else %}
+            <h4>You have no courses at this time. Add courses in <a href="{% url 'settings' %}">settings</a> or ask contact your school admin.</h4>
+        {% endif %}
+    </div>
+</body>
+{% endblock %}

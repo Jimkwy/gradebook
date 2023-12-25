@@ -23,16 +23,16 @@ def index(request):
         
         if user.school:
             #load data necesary for page load and general usage
-            classes = Course.objects.filter(teacher=user.id)
+            courses = Course.objects.filter(teacher=user.id)
             
-            if user == user.school.creator:
+            if user == user.school.master:
                 admins = user.school.admins.all()
                 return render(request, "app/index.html", {'user': user,
                                                     'admins': admins,
-                                                    'classes': classes})
+                                                    'courses': courses})
             else: 
                 return render(request, "app/index.html", {'user': user,
-                                                    'classes': classes})
+                                                    'courses': courses})
         else: 
             return HttpResponseRedirect(reverse("setupSchool"))
 
@@ -42,24 +42,78 @@ def index(request):
 
 @csrf_exempt
 @login_required
+def courses(request):
+    #initialize user
+    user = request.user
+
+    #authenticate if the user has a school
+    if user.school:
+        #load data necesary for page load and general usage with courses
+        courses = Course.objects.filter(teacher=user.id)
+
+        return render(request, "app/courses.html", {'courses':courses})
+    else:
+        return HttpResponseRedirect(reverse("index"))
+
+@csrf_exempt
+@login_required
+def settings(request):
+    return render(request, "app/settings.html")
+
+@csrf_exempt
+@login_required
 def setupSchool(request):
     # Authenticated users can compse and view ideas
     if request.user.is_authenticated:
         if request.user.school:
-            return HttpResponseRedirect(reverse("home"))
-        return render(request, "app/setupschool.html")
+            return HttpResponseRedirect(reverse("index"))
+        return render(request, "app/school/setupschool.html")
     
 @csrf_exempt
 @login_required
-def leaveSchool(request):
-    #check if request is POST
-    
+def leaveSchool(request, schoolName):
+        
+    #initialized variables
     user = request.user
+    #initilize validator value
+    valid = False
+
+    #check if submition is post, then remove user from school
+    if request.method == 'POST':
+        #check if the user is linked to a school
+        if user.school:
+            #if yes then confirm user is NOT the master, if not, redirect.
+            school = user.school
+
+            if user == user.school.master:
+                valid = False
+
+            try: 
+                print('remove')
+                user.school = None
+                user.save()
+                school.admins.remove(user)
+                school.save()
+            except:
+                valid = False
+                
+        if valid == True:
+            return HttpResponseRedirect(reverse("index"))
+        else: 
+            return HttpResponseRedirect(reverse("index"))
 
     if user.school:
-        school = School.objects.get(name=user.school)
-        print(school)
-        
+    
+        if user.school.master == user:
+            return HttpResponseRedirect(reverse("index"))
+        else:
+            courses = Course.objects.filter(school=user.school)
+            return render(request, "app/school/leaveschool.html", {"user": user,
+                                                                "courses": courses})
+    else:
+        return HttpResponseRedirect(reverse("index"))
+
+
 #API views
 #all api routes are temporary csrf_exempt for the sake of functionality testing
     
@@ -94,18 +148,21 @@ def newSchool(request):
         school.name = data["name"]
         school.address = data["address"]  
         school.phone = data["phone"]
-        school.creator = user
+        school.master = user
         school.save()
-        school.admins.add(user)
-
-        user.school = school
-        user.save()
-        print('New School Saved')
 
     except IntegrityError:
             return JsonResponse({"message": "Could not create school."}, status=400)
     
-    return HttpResponseRedirect(reverse("home"))
+    #attempt to add the school to the users profile
+    try: 
+        school.admins.add(user)
+        user.school = school
+        user.save()
+    except IntegrityError:
+            return JsonResponse({"message": "Could not save school to user profile."}, status=400)
+    
+    return HttpResponseRedirect(reverse("index"))
 
 #API function for joining a school with a referal code
 @csrf_exempt
@@ -136,7 +193,7 @@ def joinSchool(request):
     except IntegrityError:
         return JsonResponse({"error": "no school found"}, status=400)
     
-    return HttpResponseRedirect(reverse("home"))
+    return HttpResponseRedirect(reverse("index"))
 
 #API function for creating a class in a teachers roster
 @csrf_exempt
@@ -171,7 +228,7 @@ def addCourse(request):
         school.address = data["address"]  
         school.phone = data["phone"]
         school.admin = request.user
-        school.creator = request.user
+        school.master = request.user
         school.save()
 
     except IntegrityError:

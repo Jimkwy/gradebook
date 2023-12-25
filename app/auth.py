@@ -18,14 +18,14 @@ def login_user(request):
             login(request, user)
             return HttpResponseRedirect(reverse("index"))
         else:
-            return render(request, "app/login.html", {
+            return render(request, "app/auth/login.html", {
                 "message": "Invalid username and/or password."
             })
     elif request.user.is_authenticated:
         return HttpResponseRedirect(reverse("index"))
 
     else:
-        return render(request, "app/login.html")
+        return render(request, "app/auth/login.html")
 
 
 def logout_user(request):
@@ -58,7 +58,7 @@ def register(request):
             
             user.save()
         except IntegrityError:
-            return render(request, "app/register.html", {
+            return render(request, "app/auth/register.html", {
                 "message": "Username already exsists"
             })
         login(request, user)
@@ -67,4 +67,4 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
 
     else:
-        return render(request, "app/register.html")
+        return render(request, "app/auth/register.html")

@@ -16,28 +16,32 @@
         <div class="frame">
         {% if request.user.is_authenticated %}
             <div class="nav-line" id="nav-line">
-                <div class="nav-block" id="schoolBlock">
+                <a href="{% url 'index' %}"><div class="nav-block" id="schoolBlock">
                     <div class="nav-img"></div>
                     <div>{{ user.school.name }}</div>
-                </div>
+                </div></a>
                 <div class="nav-block" id="teacherBlock">
                     <div class="user-label"></div>
                     <div>{{ user.first_name }} {{user.last_name}}</div>
                 </div>
                 <div class="gradeook">
                 {% if user.school %}
-                    <div class="nav-block" id="nav-dropdown">courses <div class="arrow">
-                        <div class="nav-dropdown" id="courses">
-                            {% for copurse in courses %}
-                            <a href="" class="nav-dropdown-item">{{ course.code }}{{ course.subject }}</a>
-                            {% endfor %}
-                        </div>
-                        <button class="button" onclick="load_view('add_course')">Add New course</button>
+                <a class="button" href="{% url 'courses' %}">
+                    <div class="nav-block" id="CoursesBlock">
+                        courses
+                        <hr>
+                        {% for course in courses %}
+                        <a href="" class="nav-dropdown-item">{{ course.code }}{{ course.subject }}</a>
+                        {% endfor %}
                     </div>
-                </div>
-                <button class="button" onclick="load_view('settings')">Settings</button>
+                </a>
+                <a class="button" href="{% url 'settings' %}">
+                    <div class="nav-block" id="settingsBlock">Settings</div>
+                </a>
                 {% endif %}
-                <button class="button" href="{% url 'logout' %}">Log Out</button>
+                <a class="button" href="{% url 'logout' %}">
+                    <div class="nav-block" >Logout</div>
+                </a>
                 </div>
             </div>
         {% endif %}

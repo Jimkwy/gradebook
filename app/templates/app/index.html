@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-<title>gradebook</title>
+<title>gradebook: home</title>
 {% endblock title %}
 {% block body %}
 <body>
@@ -53,15 +53,6 @@
             <button class="button" onclick="load_view('course_view')">back</button>
             <input id="submit" type="submit" class="button"/>
         </form>
-    </div>
-    <div id="settings" class="view" style="display:none">
-        SETTINGS PAGE
-        <hr>
-        {% if user == user.school.creator %}
-            <button id="delete_school" href="{% url 'deleteSchool'}">Delete School</button>
-        {% else %}
-            <button id="leave_school" href="{% url 'leaveSchool'}">Leave School</button>
-        {% endif %}
     </div>
 </body>
 {% endblock %}

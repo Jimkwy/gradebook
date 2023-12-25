@@ -18,7 +18,7 @@ class School(models.Model):
     #DELETE if ADMIN / FOUNDER account is deleted
 
     #key fields
-    creator = models.ForeignKey('User', on_delete=models.CASCADE, related_name='created_school', null=False)
+    master = models.ForeignKey('User', on_delete=models.CASCADE, related_name='created_school', null=False)
     admins = models.ManyToManyField('User', related_name='admin_school')
     
     #required fields

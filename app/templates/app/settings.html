@@ -1,0 +1,59 @@
+{% extends 'app/layout.html' %}
+{% load static %}
+
+{% block title %}
+<title>gradebook: settings</title>
+{% endblock title %}
+{% block body %}
+<body>
+    SETTINGS PAGE
+        <button class="button" onclick="load_view('add_course')">Add New course</button>
+        <div id="add_course" class="view"style="display: none;">
+            <form id="addCourse_form" method="POST">
+                <h4>New School Submition</h4>
+                <small><i>*users (school admins) may only create one school per account</i></small>
+                <div>
+                    <h4>Class Subject: </h4>
+                    <input required class="input" id="course_subject" placeholder="Course Name" form="addCourse_form">
+                </div>
+                <div>
+                    <h4>Class Code:</h4>
+                    <input required class="input" id="course_code" placeholder="Course Subject" form="addCourse_form"></input>
+                </div>
+                <div>
+                    <h4>Course level:</h4>
+                    
+                    <input required class="input" id="course_level" placeholder="Course Level" form="addCourse_form"></input>
+                </div>
+                <div>
+                    <h4>Course Year:</h4>
+                    
+                    <input required class="input" id="course_year" placeholder="Course Year" form="addCourse_form"></input>
+                </div>
+                <div>
+                    <h4>Course Description:</h4>
+                    
+                    <input required class="input" id="course_description" placeholder="Course Desctription" form="addCourse_form"></input>
+                </div>
+                <div>
+                    <h4>Course Start Time:</h4>
+                    
+                    <input required class="input" id="course_start" placeholder="Course Start Time" form="addCourse_form"></input>
+                </div>
+                <div>
+                    <h4>Course End Time:</h4>
+                    
+                    <input required class="input" id="course_end" placeholder="Course End Time" form="addCourse_form"></input>
+                </div>
+                <input id="submit" type="submit" class="button"/>
+                <button class="button" onclick="load_view('course_view')">back</button>
+            </form>
+        </div>
+        <hr>
+        {% if user == user.school.master %}
+            <a id="delete_school" href="{% url 'deleteSchool'}">Delete School</a>
+        {% else %}
+            <a id="leave_school" href="{% url 'leaveSchool' user.school.name %}">Leave School</a>
+        {% endif %}
+</body>
+{% endblock %}

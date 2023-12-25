@@ -3,17 +3,19 @@ from django.urls import path
 from . import views, auth
 
 urlpatterns = [
-    path("home", views.index, name="home"),
+    path("", views.index, name="index"),
+    path("courses", views.courses, name="courses"),
+    path("settings", views.settings, name="settings"),
 
-    path("setupSchool", views.setupSchool, name="setupSchool"),
-    path("leaveSchool", views.leaveSchool, name="leaveSchool"),
+    path("leaveSchool/<str:schoolName>/", views.leaveSchool, name="leaveSchool"),
 
+    path("school/setupSchool", views.setupSchool, name="setupSchool"),
+    #path("school-admin/deleteSchool", views.deleteSchool, name="deleteSchool"),
+    
     #API routes
     path("newSchool", views.newSchool, name="newSchool"),
     path("joinSchool", views.joinSchool, name="joinSchool"),
     path("addCourse", views.addCourse, name="addCourse"),
-
-    #path("leaveSchool", views.leaveSchool, name="leaveSchool"),
 
     #authentiction Routes
     path("login", auth.login_user, name="login"),
