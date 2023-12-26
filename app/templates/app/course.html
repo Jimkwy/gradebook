@@ -1,0 +1,15 @@
+{% extends 'app/layout.html' %}
+{% load static %}
+
+{% block title %}
+<title>gradebook: home</title>
+{% endblock title %}
+{% block body %}
+<body>
+    <div id="welcome_view" class="view"style="display: none;">
+        <div>Welcome {{ user.first_name}} {{ user.last_name}}</div>
+    </div>
+    <div id="course_view" class="view"style="display: none;">
+    </div>
+</body>
+{% endblock %}

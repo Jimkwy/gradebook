@@ -90,6 +90,11 @@ def courses(request, source):
 
 @csrf_exempt
 @login_required
+def course(request, course_id):
+    return render(request, "app/course.html")
+
+@csrf_exempt
+@login_required
 def settings(request):
     return render(request, "app/settings.html")
 
@@ -158,36 +163,37 @@ def addCourse(request):
     if request.method == 'POST':
         if user.school:
             if user.is_admin:
-                teacher = request.POST["teacher"]
-                name = request.POST["name"]
-                subject = request.POST["subject"]
-                level = request.POST["level"]
-                year = request.POST["year"]
-                description = request.POST["description"]
-                start_time = request.POST["start_time"]
-                end_time = request.POST["end_time"]
-                start_date = request.POST["start_date"]
-                end_date = request.POST["end_date"]
-
+                teacher = request.POST.get('teacher')
+                name = request.POST.get("course_name")
+                subject = request.POST.get("course_subject")
+                level = request.POST.get("course_level")
+                year = request.POST.get("course_year")
+                description = request.POST.get("course_description")
+                start_time = request.POST.get("course_start_time")
+                end_time = request.POST.get("course_end_time")
+                start_date = request.POST.get("course_start_date")
+                end_date = request.POST.get("course_end_date")
+                
+                print(teacher, name,subject,level,year,description,start_date,start_time, end_time, end_date)   
                 # Attempt to create new user
-                try:
-                    course = Course()
-                    course.school
-                    course.teacher = Users.objects.get(id=teacher)
-                    course.name = name
-                    course.subject = subject
-                    course.level = level
-                    course.year = year
-                    course.description = description
-                    course.start_time = start_time
-                    course.end_time = end_time
-                    course.start_date = start_date
-                    course.end_date = end_date
-                    course.save()
-                    
-                except IntegrityError:
-                    return render(request, "app/school/addCourse.html", {
-                                            "message": "could not add course to course list"})
+                
+                course = Course()
+                course.school = school
+                if teacher != None:
+                    course.teacher = User.objects.get(id=teacher)
+                course.name = name
+                course.subject = subject
+                course.level = level
+                course.year = year
+                course.description = description
+                course.start_time = start_time
+                course.end_time = end_time
+                course.start_date = start_date
+                course.end_date = end_date
+                course.save()
+                
+                return HttpResponseRedirect(reverse("index"))
+            
     print('check')
     #check if user has a related school
     if user.school:
@@ -204,6 +210,10 @@ def addCourse(request):
     #if all checks fail. Redirect.
     return HttpResponseRedirect(reverse("index"))
 
+@csrf_exempt
+@login_required
+def editCourse(request, course_id = None):
+    return reverse("index")
 #API views
 #all api routes are temporary csrf_exempt for the sake of functionality testing
 
