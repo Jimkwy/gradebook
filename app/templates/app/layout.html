@@ -26,18 +26,25 @@
                 </div>
                 <div class="gradeook">
                 {% if user.school %}
-                <a class="button" href="{% url 'courses' %}">
-                    <div class="nav-block" id="CoursesBlock">
-                        courses
-                        <hr>
-                        {% for course in courses %}
-                        <a href="" class="nav-dropdown-item">{{ course.code }}{{ course.subject }}</a>
-                        {% endfor %}
-                    </div>
-                </a>
-                <a class="button" href="{% url 'settings' %}">
-                    <div class="nav-block" id="settingsBlock">Settings</div>
-                </a>
+                    {% if user.is_admin %}
+                    <a class="button" href="{% url 'courses' user.school %}">
+                        <div class="nav-block" id="CoursesBlock">
+                            All School Courses
+                        </div>
+                    </a>
+                    {% endif %}
+                    <a class="button" href="{% url 'courses' user %}">
+                        <div class="nav-block" id="CoursesBlock">
+                            My Courses
+                            <hr>
+                            {% for course in courses %}
+                            <a href="" class="nav-dropdown-item">{{ course.name }}{{ course.subject }}</a>
+                            {% endfor %}
+                        </div>
+                    </a>
+                    <a class="button" href="{% url 'settings' %}">
+                        <div class="nav-block" id="settingsBlock">Settings</div>
+                    </a>
                 {% endif %}
                 <a class="button" href="{% url 'logout' %}">
                     <div class="nav-block" >Logout</div>

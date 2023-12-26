@@ -103,8 +103,26 @@ body {
 }
 
 /* gradebook nav generation styles */
-.gradebook {
+.course-view {
+    padding:10px;
     display: flex;
     flex-direction: column;
+    border: 1px solid black;
+    flex-grow: 1;
+}
+.course-box {
+    padding:10px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid black;
+    flex-grow: 1;
+    width: 110px;
+}
+
+.course-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    border: 1px solid black;
 }
 

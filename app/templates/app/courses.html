@@ -7,12 +7,87 @@
 {% block body %}
 <body>
     <div id="course_view">
-        {% if courses > 0 %}
-            {% for course in courses %}
-            <a >{{ course.code }}{{ course.subject }}</a>
-            {% endfor %}
+        {% if course_count > 0 %}
+            {% if school_courses %}
+            <h4>All School Courses</h4>
+            <button type="button">
+                <a href="{% url 'addCourse' %}">Add Course</a>
+            </button>
+            <hr>
+        <div class="course-view" style="border:none;">
+            <div class="course-row">
+                <div class="course-box"><a>Teacher</a></div>
+                <div class="course-box"><a>Name</a></div>
+                <div class="course-box"><a>Subject</a></div>
+                <div class="course-box"><a>Level</a></div>
+                <div class="course-box"><a>Location</a></div>
+                <div class="course-box"><a>Start Date</a></div>
+                <div class="course-box"><a>End Date</a></div>
+                <div class="course-box"><a>Start Time</a></div>
+                <div class="course-box"><a>End Time</a></div>
+            </div>
+            <hr>
+                {% for course in school_courses %}
+                <div class="course-row">
+                    {% if course.teacher %}
+                        <div class="course-box"><a>{{course.teacher}}</a></div>
+                    {% else %}
+                        <div class="course-box"><a>-----</a></div>
+                    {% endif %}
+                    <div class="course-box"><a>{{course.name}}</a></div>
+                    <div class="course-box"><a>{{course.subject}}</a></div>
+                    <div class="course-box"><a>{{course.level}}</a></div>
+                    <div class="course-box"><a>{{course.location}}</a></div>
+                    <div class="course-box"><a>{{course.start_date}}</a></div>
+                    <div class="course-box"><a>{{course.end_date}}</a></div>
+                    <div class="course-box"><a>{{course.start_time}}</a></div>
+                    <div class="course-box"><a>{{course.end_time}}</a></div>
+                </div>
+                {% endfor %}
+            {% else %}
+            <h4>All School Courses</h4>
+            <button type="button">
+                <a href="{% url 'addCourse' %}">Add Course</a>
+            </button>
+            <hr>
+        <div class="course-view" style="border:none;">
+            <div class="course-row">
+                <div class="course-box"><a>Teacher</a></div>
+                <div class="course-box"><a>Name</a></div>
+                <div class="course-box"><a>Subject</a></div>
+                <div class="course-box"><a>Level</a></div>
+                <div class="course-box"><a>Location</a></div>
+                <div class="course-box"><a>Start Date</a></div>
+                <div class="course-box"><a>End Date</a></div>
+                <div class="course-box"><a>Start Time</a></div>
+                <div class="course-box"><a>End Time</a></div>
+            </div>
+            <hr>
+                {% for course in courses %}
+                    <div class="course-row">
+                        {% if course.teacher %}
+                            <div class="course-box"><a>{{course.teacher}}</a></div>
+                        {% else %}
+                            <div class="course-box"><a>-----</a></div>
+                        {% endif %}
+                        <div class="course-box"><a>{{course.name}}</a></div>
+                        <div class="course-box"><a>{{course.subject}}</a></div>
+                        <div class="course-box"><a>{{course.level}}</a></div>
+                        <div class="course-box"><a>{{course.location}}</a></div>
+                        <div class="course-box"><a>{{course.start_date}}</a></div>
+                        <div class="course-box"><a>{{course.end_date}}</a></div>
+                        <div class="course-box"><a>{{course.start_time}}</a></div>
+                        <div class="course-box"><a>{{course.end_time}}</a></div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            </div>
         {% else %}
+            {% if all %}
+            <h4>There are currently no courses associated with this school. To add courses go to <a href="{% url 'settings' %}">settings</a></h4>
+            {% else %}
             <h4>You have no courses at this time. Add courses in <a href="{% url 'settings' %}">settings</a> or ask contact your school admin.</h4>
+            {% endif %}
         {% endif %}
     </div>
 </body>

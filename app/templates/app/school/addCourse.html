@@ -1,0 +1,74 @@
+{% extends 'app/layout.html' %}
+{% load static %}
+
+{% block title %}
+<title>gradebook: Add Course</title>
+{% endblock title %}
+{% block body %}
+<body>
+        {% if user.is_admin %}
+        <div id="add_course" class="view">
+            <form id="addCourse_form" action="{% url 'addCourse' %}" method="POST">
+                <h4>New Course Submition</h4>
+                <h5><i>All new courses will be added to {{user.school}}.</i></h5>
+                <h5><i>Admins: The teacher field may be left unassigned. </i></h5>
+                <h5><i>To assign a course to a teacher at a later time, go to the courses settings from the <a href="{% url 'courses' user.school %}">School courses page</a></i></h5>
+                <div>
+                    <h4>Course Teacher: </h4>
+                    <select name="teachers" placeholder="Course Teacher" form="addCourse_form">
+                        <option>-----</option>
+                        {% for teacher in teachers %}
+                        <option value="{{teahcer.id}}">{{teacher.first_name}}{{teacher.last_name}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <h4>Course Name: </h4>
+                    <input required class="input" id="course_subject" placeholder="Course Name" form="addCourse_form">
+                </div>
+                <div>
+                    <h4>Class Subject:</h4>
+                    <input required class="input" id="course_Subject" placeholder="Course Subject" form="addCourse_form"></input>
+                </div>
+                <div>
+                    <h4>Course level:</h4>
+                    
+                    <input required class="input" id="course_level" placeholder="Course Level" form="addCourse_form"></input>
+                </div>
+                <div>
+                    <h4>Course Year:</h4>
+                    
+                    <input required class="input" id="course_year" placeholder="Course Year" form="addCourse_form"></input>
+                </div>
+                <div>
+                    <h4>Course Start Date:</h4>
+                    
+                    <input required type="date" id="course_start" placeholder="Course Start Time" form="addCourse_form"></input>
+                </div>
+                <div>
+                    <h4>Course End Date:</h4>
+                    
+                    <input required type="date" id="course_end" placeholder="Course End Time" form="addCourse_form"></input>
+                </div>
+                <div>
+                    <h4>Course Start Time:</h4>
+                    
+                    <input required type="time" id="course_start" placeholder="Course Start Time" form="addCourse_form"></input>
+                </div>
+                <div>
+                    <h4>Course End Time:</h4>
+                    
+                    <input required type="time" id="course_end" placeholder="Course End Time" form="addCourse_form"></input>
+                </div>
+                <hr>
+                <input id="submit" type="submit" class="button"/>
+                <button class="button" onclick="load_view('course_view')">back</button>
+                <hr>
+            </form>
+        </div>
+        {% endif %}
+        <div id="remove_course">
+
+        </div>
+</body>
+{% endblock %}

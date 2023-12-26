@@ -42,16 +42,49 @@ def index(request):
 
 @csrf_exempt
 @login_required
-def courses(request):
-    #initialize user
+def courses(request, source):
+    #initialize user and other varriables
     user = request.user
-
-    #authenticate if the user has a school
+    all = False
+    school_courses = []
+    courses = []
+    # authenticate if user has a school
     if user.school:
-        #load data necesary for page load and general usage with courses
-        courses = Course.objects.filter(teacher=user.id)
 
-        return render(request, "app/courses.html", {'courses':courses})
+        if source:
+            #try to look up as school
+            try:
+                school = School.objects.get(name=source)
+                #authenticate admin status
+                if user.is_admin == True:
+                    #load all courses related to the school
+                    school_courses = Course.objects.filter(school=user.school.id)
+                    courses = Course.objects.filter(teacher=user)
+                    course_count = len(school_courses)
+                    all = True
+                    
+                else: 
+                    #load data associated with user/teacher/parent
+                    courses = Course.objects.filter(teacher=user)
+                    course_count = len(courses)
+                    all = False
+            except:
+                #load data associated with user/teacher/parent
+                courses = Course.objects.filter(teacher=user)
+                course_count = len(courses)
+                all = False
+                
+        else:
+            #load data associated with user/teacher/parent
+            courses = Course.objects.filter(teacher=user.id)
+            course_count = len(courses)
+        #render
+
+        return render(request, "app/courses.html", {'courses':courses,
+                                                    'school_courses':school_courses,
+                                                        'course_count': course_count,
+                                                        'all': all})
+        
     else:
         return HttpResponseRedirect(reverse("index"))
 
@@ -60,6 +93,7 @@ def courses(request):
 def settings(request):
     return render(request, "app/settings.html")
 
+#data manipulation pages
 @csrf_exempt
 @login_required
 def setupSchool(request):
@@ -113,10 +147,66 @@ def leaveSchool(request, schoolName):
     else:
         return HttpResponseRedirect(reverse("index"))
 
+@csrf_exempt
+@login_required
+def addCourse(request):
+    #initialize data
+    user = request.user
+    school = user.school
+
+    #check if submition is POST
+    if request.method == 'POST':
+        if user.school:
+            if user.is_admin:
+                teacher = request.POST["teacher"]
+                name = request.POST["name"]
+                subject = request.POST["subject"]
+                level = request.POST["level"]
+                year = request.POST["year"]
+                description = request.POST["description"]
+                start_time = request.POST["start_time"]
+                end_time = request.POST["end_time"]
+                start_date = request.POST["start_date"]
+                end_date = request.POST["end_date"]
+
+                # Attempt to create new user
+                try:
+                    course = Course()
+                    course.school
+                    course.teacher = Users.objects.get(id=teacher)
+                    course.name = name
+                    course.subject = subject
+                    course.level = level
+                    course.year = year
+                    course.description = description
+                    course.start_time = start_time
+                    course.end_time = end_time
+                    course.start_date = start_date
+                    course.end_date = end_date
+                    course.save()
+                    
+                except IntegrityError:
+                    return render(request, "app/school/addCourse.html", {
+                                            "message": "could not add course to course list"})
+    print('check')
+    #check if user has a related school
+    if user.school:
+        #check if user has admin access
+        if user.is_admin:
+            #load data necesary for page load and general usage
+            try:
+                teachers = User.objects.filter(school=school, is_teacher=True)
+                courses = Course.objects.filter(teacher=user)
+                return render(request, "app/school/addCourse.html", {'teachers':teachers,
+                                                                     'courses':courses})
+            except:
+                return HttpResponseRedirect(reverse("index"))
+    #if all checks fail. Redirect.
+    return HttpResponseRedirect(reverse("index"))
 
 #API views
 #all api routes are temporary csrf_exempt for the sake of functionality testing
-    
+
 #API fuction for creating a new school
 @csrf_exempt
 @login_required
@@ -140,7 +230,7 @@ def newSchool(request):
     if data.get("phone") is None and len(data.get("phone")) == 0:
         return JsonResponse({"error": "Please provide a school phone number"}, status=400)
     #generate referal code for other users to join the school as a teacher/admin/parent
-    school.code = CodeGen()
+    school.code = CodeGen(1)
     if len(school.code) == 0:
         return JsonResponse({"error": "referal code could not be generated"}, status=500)
     #attempt to create new school object
@@ -194,47 +284,6 @@ def joinSchool(request):
         return JsonResponse({"error": "no school found"}, status=400)
     
     return HttpResponseRedirect(reverse("index"))
-
-#API function for creating a class in a teachers roster
-@csrf_exempt
-@login_required
-def addCourse(request):
-     # Submiting a new school must be via POST
-    if request.method != "POST":
-        return JsonResponse({"error": "POST request required."}, status=400)
-    
-    #initialize school object
-    course = Course()
-
-    #pull json data from POST request
-    data = json.loads(request.body)
-    
-    #check all required feilds are completed
-    if data.get("subject") is None and len(data.get("subject")) == 0:
-        return JsonResponse({"error": "Please provide a course subject"}, status=400)
-    if data.get("code") is None and len(data.get("code")) == 0:
-        return JsonResponse({"error": "Please provide a course idetifyer code"}, status=400)
-    if data.get("level") is None and len(data.get("phone")) == 0:
-        return JsonResponse({"error": "Please provide a school phone number"}, status=400)
-    
-    #generate referal code for other users to join the school as a teacher/admin/parent
-    school.code = CodeGen()
-    if len(school.code) == 0:
-        return JsonResponse({"error": "referal code could not be generated"}, status=500)
-    
-    #attempt to create new school object
-    try:
-        school.name = data["name"]
-        school.address = data["address"]  
-        school.phone = data["phone"]
-        school.admin = request.user
-        school.master = request.user
-        school.save()
-
-    except IntegrityError:
-            return JsonResponse({"message": "Could not create school."}, status=400)
-    
-    return JsonResponse({"message": "New school created successfully."}, status=201)
 
 
 

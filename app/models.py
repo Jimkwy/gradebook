@@ -43,15 +43,15 @@ class School(models.Model):
 class Course(models.Model):
     #key fields
     school = models.ForeignKey('School', on_delete=models.CASCADE, related_name='facility', null=False)
-    teacher = models.ForeignKey('User', on_delete=models.SET_NULL, related_name='teacher', null=True)
+    teacher = models.ForeignKey('User', on_delete=models.SET_NULL, related_name='teacher', null=True, blank=True)
 
     #required fields for object to be created
     name = models.CharField(max_length=64, blank=False, null=True) #name of class
     subject = models.CharField(max_length=128, blank=False) #subject of class
     grade_type = models.BooleanField(default=0, blank=False) #used to set grading system
-                                                             #grading systems: 0= points/percent, 1= letter (A-f, incomplete or complete, etc)
+                                                             #grading systems: True= points/percent, False= letter (A-f, incomplete or complete, etc)
     
-
+    
     #optional fields
     code = models.CharField(max_length=128, blank=True, null=True) #class identifer or differentiator(if any)
     level = models.CharField(max_length=24, blank=True, null=True)
@@ -70,7 +70,7 @@ class Course(models.Model):
 
     #display settings in site admin backend
     def __str__(self):
-        return f"{self.name + ' ' + self.teacher}"
+        return f"{self.name}"
 
     #serializer for JSON
     def serializer(self):
