@@ -1,0 +1,46 @@
+{% extends 'app/layout.html' %}
+{% load static %}
+
+{% block title %}
+<title>gradebook: School Setup</title>
+{% endblock title %}
+{% block body %}
+<body>
+    <h4>If you were given an access code from your school admin. Enter it below.</h4>
+    <div id="joinSchool"  class="course-row">
+        <div>
+        <form id="join_form" action="{% url 'setupSchool' 'join' %}"method="POST">
+            <h4>Enter your schools private access code to join.</h4>
+                <input required class="input" id="school_code" placeholder="Access code" form="join_form" name="code"></input>
+            <input id="submit" type="submit" class="button"/>
+        </form>
+        <p><small>Please Use the access code sent to you by your school or organizations administration. If you ecounter any errors please contact your school administration or check out our FAQ.</small></p>
+    </div>
+    </div>
+    <h4>If you are setting up a new school, enter the schools information below.</h4>
+    <div id="newSchool" class="course-row">
+        <div>
+        <form id="newSchool_form" action="{% url 'setupSchool' 'newschool' %}" method="POST">
+            <h4>New School Submition</h4>
+            <hr>
+            <div>
+                <h4>School Name: </h4>
+                <input required class="input" name="school_name" placeholder="School Name" form="newSchool_form">
+            </div>
+            <hr>
+            <div>
+                <h4>School Address:</h4>
+                <input required class="input" name="school_address" placeholder="Address" form="newSchool_form"></input>
+            </div>
+            <hr>
+            <div>
+                <h4>School Phone Number:</h4>
+                <input required class="input" name="school_phone" placeholder="Phone" form="newSchool_form"></input>
+            </div>
+            <hr>
+            <input id="submit" type="submit" class="button"/>
+            </div>
+        </form>
+    </div>
+</body>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends 'app/layout.html' %}
+{% load static %}
+
+{% block title %}
+<title>gradebook: courses</title>
+{% endblock title %}
+{% block body %}
+<body>
+    <div id="course_view">
+    {% if course_count > 0 %}
+        {% if user.is_admin and all == False %}
+        <h4>My Course Directory</h4>
+        <a class="button" href="{% url 'courses' 'school' %}">
+            <h4>School Course Directory</h4>
+        </a>
+        {% endif %}
+        {% if user.is_teacher and all %}
+            <h4>School Course Directory</h4>
+            <a class="button" href="{% url 'courses' 'teacher' %}">
+                <h4>My Course Directory</h4>
+            </a>
+        <button type="button">
+            <a href="{% url 'addCourse' %}">Add Course</a>
+        </button>
+        {% endif %}
+        <hr>
+        <div class="course-view" style="border:none;">
+            <div class="course-row">
+                <a href="{% url 'courses' 'school' 'teacher' %}"> <div class="course-box">Teacher</div> </a>
+                <a href="{% url 'courses' 'school' 'name' %}"><div class="course-box">Name</div></a>
+                <a href="{% url 'courses' 'school' 'subject' %}"><div class="course-box">Subject</div></a>
+                <a href="{% url 'courses' 'school' 'level' %}"><div class="course-box">Level</div></a>
+                <a href="{% url 'courses' 'school' 'location' %}"><div class="course-box">Location</div></a>
+                <a href="{% url 'courses' 'school' 'start_date' %}"><div class="course-box">Start Date</div></a>
+                <a href="{% url 'courses' 'school' 'end_date' %}"><div class="course-box">End Date</div></a>
+                <a href="{% url 'courses' 'school' 'start_time' %}"><div class="course-box">Start Time</div></a>
+                <a href="{% url 'courses' 'school' 'end_time' %}"><div class="course-box">End Time</div></a>
+                <div class="course-box">Links</div>
+            </div>
+            <hr>
+            {% for course in courses_list %}
+                <div class="course-row">
+                    {% if course.teacher %}
+                        <div class="course-box">{{course.teacher}}</div>
+                    {% else %}
+                        <div class="course-box"></div>
+                    {% endif %}
+                    <div class="course-box">{{course.name}}</div>
+                    <div class="course-box">{{course.subject}}</div>
+                    <div class="course-box">{{course.level}}</div>
+                    <div class="course-box">{{course.location}}</div>
+                    <div class="course-box">{{course.start_date}}</div>
+                    <div class="course-box">{{course.end_date}}</div>
+                    <div class="course-box">{{course.start_time}}</div>
+                    <div class="course-box">{{course.end_time}}</div>
+                    <div class="course-box">
+                            <a class="button" href="{% url 'course' course.code %}">More info</a>
+                            <hr>
+                            {% if course.teacher.id == user.id or user.is_admin %}
+                            <a class="button" href="{% url 'gradebook' course.code %}">Gradebook</a>
+                            {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        {% if all %}
+        <h4>There are currently no courses associated with this school. To add courses go to <a href="{% url 'settings' %}">settings</a></h4>
+        {% else %}
+        <h4>You have no courses at this time. Add courses in <a href="{% url 'settings' %}">settings</a> or ask contact your school admin.</h4>
+        {% endif %}
+    {% endif %}
+    </div>
+</body>
+{% endblock %}

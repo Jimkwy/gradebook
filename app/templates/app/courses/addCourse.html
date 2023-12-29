@@ -1,0 +1,38 @@
+{% extends 'app/layout.html' %}
+{% load static %}
+
+{% block title %}
+{% if edit %}
+<title>gradebook: Edit Course</title>
+{% else %}
+<title>gradebook: Add Course</title>
+{% endif %}
+{% endblock title %}
+{% block body %}
+<body>
+    <div>
+        <form action="" method="POST">
+            {% if edit %}
+            <h4>Edit Course </h4>
+            <h4>{{course.name}} {{course.subject}} </h4>
+            <h5>Code: {{course.code}}</h5>
+            {% else %}
+            <h4>New Course Submition</h4>
+            <h5><i>All new courses will be added to {{user.school}}.</i></h5>
+            <h5><i>Admins: The teacher field may be left unassigned. </i></h5>
+            <h5><i>To assign a course to a teacher at a later time, go to the course's settings from <a href="{% url 'courses' user.school %}">School courses</a>, click more info and click edit at the top of the page.</i></h5>
+            {% endif %}
+            <div class="form">
+                {{ form }}
+            <div >
+            <input id="submit" type="submit" class="button"/>
+            <button class="button" onclick="load_view('course_view')">back</button>
+            </div>
+            </div>
+        </form>
+    </div>
+    <div id="remove_course">
+
+    </div>
+</body>
+{% endblock %}

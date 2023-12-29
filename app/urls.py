@@ -3,21 +3,33 @@ from django.urls import path
 from . import views, auth
 
 urlpatterns = [
+    #general site routes
     path("", views.index, name="index"),
-    path("courses/<str:source>", views.courses, name="courses"),
-    path("course/<int:course_id>", views.course, name="course"),
     path("settings", views.settings, name="settings"),
 
-    #school related paths
-    path("setupSchool", views.setupSchool, name="setupSchool"),
-    path("addCourse", views.addCourse, name="addCourse"),
-    path("editCourse/<str:course_id>", views.editCourse, name="editCourse"),
-    path("leaveSchool/<str:schoolName>/", views.leaveSchool, name="leaveSchool"),
-    #path("school-admin/deleteSchool", views.deleteSchool, name="deleteSchool"),
+    #school related routes
+    path("school/setup", views.setupSchool, name="setupSchool"),
+    path("school/setup/<str:type>", views.setupSchool, name="setupSchool"),
+    path("school/leaveschool/", views.leaveSchool, name="leaveSchool"),
+    path("school/admin/deleteSchool", views.deleteSchool, name="deleteSchool"),
+    path("school/settings", views.settings, name="settings"),
+
+    #student related routes
+    path("students/all/<str:source>", views.students, name="students"),
+    path("students/all/<str:source>/sortby/<str:sortby>", views.students, name="students"),
+
+    #course and gradebook routes
+    path("courses/all/", views.courses, name="courses"),
+    path("courses/all/<str:source>/", views.courses, name="courses"),
+    path("courses/all/<str:source>/sort/<str:sortby>", views.courses, name="courses"),
+    path("courses/moreinfo/<str:course_code>", views.course, name="course"),
+    path("courses/course", views.addCourse, name="addCourse"),
+    path("courses/course/<str:course_id>", views.addCourse, name="addCourse"),
+
+    #gradebook routes
+    path("gradebook/<str:course>", views.gradebook, name="gradebook"),
     
     #API routes
-    path("newSchool", views.newSchool, name="newSchool"),
-    path("joinSchool", views.joinSchool, name="joinSchool"),
 
     #authentiction Routes
     path("login", auth.login_user, name="login"),

@@ -1,0 +1,49 @@
+{% extends 'app/layout.html' %}
+{% load static %}
+
+{% block title %}
+<title>gradebook: {{course.name}}</title>
+{% endblock title %}
+{% block body %}
+<body>
+    <h4>Course: {{course.name}}</h4>
+    <button type="button">
+        <a href="{% url 'addCourse' course.code %}">Edit Course</a>
+    </button>
+    <hr>
+    <h5>Course information</h5>
+    <hr>
+<div class="course-row">
+    <div class="course-box">Teacher</div>
+    <div class="course-box">Name</div>
+    <div class="course-box">Subject</div>
+    <div class="course-box">Grade Level</div>
+    <div class="course-box">Location</div>
+    <div class="course-box">Students Enrolled</div>
+</div>
+<div class="course-row">
+    <div class="course-box">{{course.teacher}}</div>
+    <div class="course-box">{{course.name}}</div>
+    <div class="course-box">{{course.subject}}</div>
+    <div class="course-box">{{course.level}}</div>
+    <div class="course-box">{{course.location}}</div>
+    <div class="course-box">{{course.students}}</div>
+</div>
+<h5>Course Times</h5>
+<hr>
+<div class="course-row">
+    <div class="course-box">{{course.start_date}}</div>
+    <div class="course-box">{{course.end_date}}</div>
+    <div class="course-box">{{course.start_time}}</div>
+    <div class="course-box">{{course.end_time}}</div>
+</div>
+<h5>Other Course information</h5>
+<hr>
+<div class="course-row">
+    <div class="course-box">{{course.description}}</div>
+</div>
+<div class="course-row">
+    Course added on {{course.timestamp}} by {{course.admin}}
+</div>
+</body>
+{% endblock %}

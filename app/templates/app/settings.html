@@ -12,11 +12,11 @@
         <h4>You are currently associated with {{user.school}}. </h4>
         {% if user == user.school.master %}
         <button type="link">
-            <a id="delete_school" href="{% url 'deleteSchool'}">Delete School</a>
+            <a id="delete_school" href="{% url 'deleteSchool' %}">Delete School</a>
         </button>
         {% else %}
         <button type="link">
-            <a id="leave_school" href="{% url 'leaveSchool' user.school.name %}">Leave School</a>
+            <a id="leave_school" href="{% url 'leaveSchool' %}">Leave School</a>
         </button>
         {% endif %}
         <hr>

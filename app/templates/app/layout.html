@@ -14,44 +14,54 @@
     </head>
     <div class="row">
         <div class="frame">
-        {% if request.user.is_authenticated %}
-            <div class="nav-line" id="nav-line">
-                <a href="{% url 'index' %}"><div class="nav-block" id="schoolBlock">
-                    <div class="nav-img"></div>
-                    <div>{{ user.school.name }}</div>
-                </div></a>
-                <div class="nav-block" id="teacherBlock">
-                    <div class="user-label"></div>
-                    <div>{{ user.first_name }} {{user.last_name}}</div>
-                </div>
-                <div class="gradeook">
-                {% if user.school %}
-                    {% if user.is_admin %}
-                    <a class="button" href="{% url 'courses' user.school %}">
-                        <div class="nav-block" id="CoursesBlock">
-                            All School Courses
-                        </div>
+            {% if request.user.is_authenticated %}
+                <div class="nav-line" id="nav-line">
+                    {% if user.school %}
+                    <a href="{% url 'index' %}">
+                    <div class="nav-block" id="schoolBlock">
+                        <div class="nav-img"></div>
+                        <div>{{ user.school.name }}</div>
+                    </div>
                     </a>
                     {% endif %}
-                    <a class="button" href="{% url 'courses' user %}">
-                        <div class="nav-block" id="CoursesBlock">
-                            My Courses
-                            <hr>
+                    <div class="nav-block" id="teacherBlock">
+                        <div class="user-label"></div>
+                        <div>{{ user.first_name }} {{user.last_name}}</div>
+                    </div>
+                    {% if user.school %}
+                        {% if user.is_teacher and courses %}
+                        <div class="nav-block" id="gradebook-block">
+                            <h4>Gradebook</h4>
                             {% for course in courses %}
-                            <a href="" class="nav-dropdown-item">{{ course.name }}{{ course.subject }}</a>
+                            <a href="{% url 'gradebook' course.code %}" class="nav-dropdown-item">{{ course.name }} {{course.subject}}</a>
                             {% endfor %}
                         </div>
+                        {% endif %}
+                        {% if user.is_teacher == True and user.is_admin == False %}
+                        <a class="button" href="{% url 'courses' 'teacher' %}">
+                            <div class="nav-block" id="CoursesBlock">Course Directory</div>
+                        </a>
+                        <a class="button" href="{% url 'students' 'teacher' %}">
+                            <div class="nav-block">Student Directory</div>
+                        </a>
+                        {% endif %}
+                        {% if user.is_admin %}
+                        <a class="button" href="{% url 'courses' 'school' %}">
+                            <div class="nav-block" id="CoursesBlock">Course Directory</div>
+                        </a>
+                        <a class="button" href="{% url 'students' 'school' %}">
+                            <div class="nav-block">Student Directory</div>
+                        </a>
+                        <a class="button" href="{% url 'settings' %}">
+                            <div class="nav-block" id="settingsBlock">School Settings</div>
+                        </a>
+                        {% endif %}
+                    {% endif %}
+                    <a class="button" href="{% url 'logout' %}">
+                        <div class="nav-block" >Logout</div>
                     </a>
-                    <a class="button" href="{% url 'settings' %}">
-                        <div class="nav-block" id="settingsBlock">Settings</div>
-                    </a>
-                {% endif %}
-                <a class="button" href="{% url 'logout' %}">
-                    <div class="nav-block" >Logout</div>
-                </a>
                 </div>
-            </div>
-        {% endif %}
+            {% endif %}
             <main>
                 {% block body %}
                 {% endblock %}
@@ -59,5 +69,4 @@
             </main>
         </div>
     </div>
-    </body>
 </html>

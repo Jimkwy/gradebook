@@ -25,8 +25,11 @@ class School(models.Model):
     name = models.CharField(max_length=128, blank=False, null=True)
     address = models.CharField(max_length=512, blank=False, null=True)
     phone = models.CharField(max_length=32, blank=False, null=True)
-    code = models.CharField(max_length=14, blank=False, default='aaa-aaa-aaa') #referal code
-    
+
+    #fields for requistration codes
+    admin_code = models.CharField(max_length=14, blank=False, default='aaaa-aaaa-aaaa') #referal code
+    teacher_code = models.CharField(max_length=14, blank=False, default='aaaa-aaaa-aaaa') #referal code
+    parent_code = models.CharField(max_length=14, blank=False, default='aaaa-aaaa-aaaa') #referal code
     #logo = models.ImageField('Image', upload_to='images/', blank=True, null=True)
     
     timestamp = models.DateTimeField(auto_now_add=True)
@@ -44,7 +47,7 @@ class Course(models.Model):
     #key fields
     school = models.ForeignKey('School', on_delete=models.CASCADE, related_name='facility', null=False)
     teacher = models.ForeignKey('User', on_delete=models.SET_NULL, related_name='teacher', null=True, blank=True)
-
+    added_by = models.ForeignKey('User', on_delete=models.CASCADE, related_name='course_added_by', null=True, blank=True)
     #required fields for object to be created
     name = models.CharField(max_length=64, blank=False, null=True) #name of class
     subject = models.CharField(max_length=128, blank=False) #subject of class
@@ -58,6 +61,9 @@ class Course(models.Model):
     description = models.TextField(max_length=512, blank=True, null=True)
     online = models.BooleanField(default=False, blank=True, null=True) #if course is online(true) or inperson (false)
     location = models.CharField(max_length=128, blank=True, null=True) #physical location of class if any
+
+    #keep track of student number in class
+    students = models.PositiveIntegerField(blank=True, null=True, default=0)
 
     #scheduling dates and times for the class, editable
     start_date = models.DateField(auto_now_add=False, blank=True, null=True)
@@ -92,6 +98,7 @@ class Course(models.Model):
 class Student(models.Model):
     #key models
     school = models.ForeignKey('School', on_delete=models.CASCADE, related_name='student') #DO NOT delete student info unless specified upon data deletion
+    added_by = models.ForeignKey('User', on_delete=models.CASCADE, related_name='student_added_by', null=True, blank=True)
     
     #required Fields
     first_name = models.CharField(max_length=64, blank=False, null=True)
@@ -144,6 +151,8 @@ class Attendance(models.Model):
     #key Fields
     school = models.ForeignKey('School', on_delete=models.CASCADE, related_name="attending_school")
     student = models.ForeignKey('Student', on_delete=models.CASCADE, related_name="attendee")
+    added_by = models.ForeignKey('User', on_delete=models.CASCADE, related_name='attendance_added_by', null=True, blank=True)
+
     
     #required Fields
     attendance = models.BooleanField(default=True)
