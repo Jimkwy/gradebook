@@ -2,19 +2,17 @@
 {% load static %}
 
 {% block title %}
-<title>gradebook: courses</title>
+<title>gradebook: Student Directory</title>
 {% endblock title %}
 {% block body %}
 <body>
     <div id="course_view">
-    {% if course_count > 0 %}
-        {% if user.is_admin and all == False %}
+        {% if user.is_teacher and all == False %}
         <h4>My Course Directory</h4>
         <a class="button" href="{% url 'courses' 'school' %}">
             <h4>School Course Directory</h4>
         </a>
-        {% endif %}
-        {% if user.is_teacher and all %}
+        {% elif user.is_admin and all %}
             <h4>School Course Directory</h4>
             <a class="button" href="{% url 'courses' 'teacher' %}">
                 <h4>My Course Directory</h4>
@@ -26,18 +24,28 @@
         <hr>
         <div class="course-view" style="border:none;">
             <div class="course-row">
+                {% if all == True %}
                 <a href="{% url 'courses' 'school' 'teacher' %}"> <div class="course-box">Teacher</div> </a>
                 <a href="{% url 'courses' 'school' 'name' %}"><div class="course-box">Name</div></a>
                 <a href="{% url 'courses' 'school' 'subject' %}"><div class="course-box">Subject</div></a>
                 <a href="{% url 'courses' 'school' 'level' %}"><div class="course-box">Level</div></a>
                 <a href="{% url 'courses' 'school' 'location' %}"><div class="course-box">Location</div></a>
-                <a href="{% url 'courses' 'school' 'start_date' %}"><div class="course-box">Start Date</div></a>
-                <a href="{% url 'courses' 'school' 'end_date' %}"><div class="course-box">End Date</div></a>
                 <a href="{% url 'courses' 'school' 'start_time' %}"><div class="course-box">Start Time</div></a>
                 <a href="{% url 'courses' 'school' 'end_time' %}"><div class="course-box">End Time</div></a>
                 <div class="course-box">Links</div>
+                {% else %}
+                <a href="{% url 'courses' 'teacher' 'teacher' %}"> <div class="course-box">Teacher</div> </a>
+                <a href="{% url 'courses' 'teacher' 'name' %}"><div class="course-box">Name</div></a>
+                <a href="{% url 'courses' 'teacher' 'subject' %}"><div class="course-box">Subject</div></a>
+                <a href="{% url 'courses' 'teacher' 'level' %}"><div class="course-box">Level</div></a>
+                <a href="{% url 'courses' 'teacher' 'location' %}"><div class="course-box">Location</div></a>
+                <a href="{% url 'courses' 'teacher' 'start_time' %}"><div class="course-box">Start Time</div></a>
+                <a href="{% url 'courses' 'teacher' 'end_time' %}"><div class="course-box">End Time</div></a>
+                <div class="course-box">Links</div>
+                {% endif %}
             </div>
             <hr>
+            {% if course_count > 0 %}
             {% for course in courses_list %}
                 <div class="course-row">
                     {% if course.teacher %}
@@ -49,8 +57,6 @@
                     <div class="course-box">{{course.subject}}</div>
                     <div class="course-box">{{course.level}}</div>
                     <div class="course-box">{{course.location}}</div>
-                    <div class="course-box">{{course.start_date}}</div>
-                    <div class="course-box">{{course.end_date}}</div>
                     <div class="course-box">{{course.start_time}}</div>
                     <div class="course-box">{{course.end_time}}</div>
                     <div class="course-box">
@@ -65,7 +71,7 @@
         </div>
     {% else %}
         {% if all %}
-        <h4>There are currently no courses associated with this school. To add courses go to <a href="{% url 'settings' %}">settings</a></h4>
+        <h4>There are currently no courses associated with this school.</a></h4>
         {% else %}
         <h4>You have no courses at this time. Add courses in <a href="{% url 'settings' %}">settings</a> or ask contact your school admin.</h4>
         {% endif %}

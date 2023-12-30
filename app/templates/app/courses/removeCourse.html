@@ -1,0 +1,27 @@
+{% load static %}
+
+{% block title %}
+<title>gradebook: settings</title>
+{% endblock title %}
+{% block body %}
+<body>
+    <h4>Are you sure you want to delete this school?</h4>
+    <h4>{{course.name}} {{course.subject}}</h4>
+    <hr>
+    <h4>What will be permenently deleted:</h4>
+    <h5>{{assignnments}} Assignments</h5>
+    <h5>{{grades}} Grades </h5>
+    <h5>All related information will also be deleted.</h5>
+    <hr>
+    <h4>Who will removed from course access:</h4>
+    <h5>Teacher: {{course.teacher}}</h5>
+    <h5>Students: {{course.students}}</h5>
+    <hr>
+    <h5>To confirm deletion, type 'delete' and hit submit</h5>
+    <form id="deleteCourse_form" action="{% url 'removeCourse' course.code %}" method="post" >
+        <input required class="input" name="delete" form="deleteCourse_form">
+        <input type="submit" title="Yes, remove course">
+        <button type="button"><a href="{% url 'courses' %}">No, Take me back</a></button>
+    </form>
+</body>
+{% endblock %}

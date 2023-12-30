@@ -1,0 +1,62 @@
+{% extends 'app/layout.html' %}
+{% load static %}
+
+{% block title %}
+<title>gradebook: {{student.last_name}}, {{student.first_name}}</title>
+{% endblock title %}
+{% block body %}
+<body>
+    <h4>student: {{student.last_name}}, {{student.first_name}}</h4>
+    {% if user.is_admin %}
+    <button type="button">
+        <a href="{% url 'addStudent' student.code %}">Edit student</a>
+    </button>
+    {% endif %}
+    <hr>
+    <h5>Student information</h5>
+    <hr>
+<div class="course-row">
+    <div class="course-box">Student Id</div>
+    <div class="course-box">Name</div>
+    <div class="course-box">Grade Level</div>
+    <div class="course-box">Courses Enrolled</div>
+</div>
+<div class="course-row">
+    <div class="course-box">{{student.code}}</div>
+    <div class="course-box">{{student.last_name}}, {{student.first_name}}</div>
+    <div class="course-box">{{student.level}}</div>
+    <div class="course-box">{{student.course_count}}</div>
+</div>
+<hr>
+<div class="course-row">
+    <div class="course-box">Birthday</div>
+    <div class="course-box">Contact</div>
+</div>
+<div class="course-row">
+    <div class="course-box">{{student.birthday}}</div>
+    <div class="course-box">{{student.contact}}</div>
+</div>
+<h5>Addmissition information</h5>
+<div class="course-row">
+    <div class="course-box">Addmission Date</div>
+    {% if student.exit %}
+    <div class="course-box">Nonadmission Date</div>
+    <div class="course-box">Nonadmission Type</div>
+    {% endif %}
+</div>
+<div class="course-row">
+    <div class="course-box">{{student.start_date}}</div>
+    {% if student.admitted != True %}
+    <div class="course-box">{{student.end_date}}</div>
+    <div class="course-box">{{student.nonadmission_type}}</div>
+    {% endif %}
+</div>
+<h5>Other Student information</h5>
+<hr>
+{% if user.is_admin %}
+<div class="course-row">
+    Student added on {{student.timestamp}} by {{student.added_by}}
+</div>
+{% endif %}
+</body>
+{% endblock %}

@@ -7,9 +7,14 @@
 {% block body %}
 <body>
     <h4>Course: {{course.name}}</h4>
+    {% if user.is_admin %}
+    <button>
+        <a href="{% url 'enroll' course.code %}">Enroll Student</a>
+    </button>
     <button type="button">
         <a href="{% url 'addCourse' course.code %}">Edit Course</a>
     </button>
+    {% endif %}
     <hr>
     <h5>Course information</h5>
     <hr>

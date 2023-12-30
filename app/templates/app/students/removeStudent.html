@@ -1,0 +1,23 @@
+{% load static %}
+
+{% block title %}
+<title>gradebook: Remove Student {{student.last_name}}, {{student.first_name}}</title>
+{% endblock title %}
+{% block body %}
+<body>
+    <h4>Are you sure you want to delete this student?</h4>
+    <h4>{{student.last_name}}, {{student.first_name}}</h4>
+    <h4> Code: {{student.code}}</h4>
+    <hr>
+    <h4>What will be permenently deleted:</h4>
+    <h5>{{grades}} Grades </h5>
+    <h5>All related information will also be deleted.</h5>
+    <hr>
+    <h5>To confirm deletion, type 'delete' and hit submit</h5>
+    <form id="deleteStudent_form" action="{% url 'removeStudent' student.code %}" method="post" >
+        <input required class="input" name="delete" form="deleteStudent_form">
+        <input type="submit" title="Yes, remove course">
+        <button type="button"><a href="{% url 'students' %}">No, Take me back</a></button>
+    </form>
+</body>
+{% endblock %}

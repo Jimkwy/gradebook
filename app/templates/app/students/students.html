@@ -2,10 +2,106 @@
 {% load static %}
 
 {% block title %}
-<title>gradebook: home</title>
+<title>gradebook: students</title>
 {% endblock title %}
 {% block body %}
 <body>
-    {{user.school}}
+    <div id="course_view">
+    {% if all == True and admitted == True %}
+        <h4>School Student Directory</h4>
+        <div class="course-row">
+            <h4>Admitted Directory</h4>
+            <a href="{% url 'students' 'nonadmitted'%}">
+                <h4>Nonadmitted Directory</h4>
+            </a>
+        </div>
+        <button type="button">
+            <a href="{% url 'addStudent' %}">Add Student</a>
+        </button>
+        {% if user.is_teacher %}
+        <a class="button" href="{% url 'students' 'teacher' %}">
+            <h4>My Student Directory</h4>
+        </a>
+        {% endif %}
+    {% elif all == True and admitted == False %}
+        <h4>School Student Directory</h4>
+        <div class="course-row">
+            <a href="{% url 'students' 'school' %}">
+                <h4>Admitted Directory</h4>
+            </a>
+            <h4>Nonadmitted Directory</h4>
+        </div>
+        <button type="button">
+        <a href="{% url 'addStudent' %}">Add Student</a>
+        </button>
+        {% if user.is_teacher %}
+        <a class="button" href="{% url 'students' 'teacher' %}">
+            <h4>My Student Directory</h4>
+        </a>
+        {% endif %}
+    {% endif %}
+    {% if user.is_teacher and admitted == True and all == False %}
+        <h4>My Student Directory</h4>
+        <a href="{% url 'students' 'school' %}">
+            <h4>School Student Directory</h4>
+        </a>
+    {% endif %}
+    <hr>
+    <div class="course-view" style="border:none;">
+        <div class="course-row">
+            {% if all == True and admitted == True %}
+            <a href="{% url 'students' 'school' 'code' %}"> <div class="course-box">Student Id</div> </a>
+            <a href="{% url 'students' 'school' 'last_name' %}"><div class="course-box">Name</div></a>
+            <a href="{% url 'students' 'school' 'level' %}"><div class="course-box">Level</div></a>
+            <a href="{% url 'students' 'school' 'course_count' %}"><div class="course-box">Courses</div></a>
+            <div class="course-box">Links</div>
+            {% elif admitted == True %}
+            <a href="{% url 'students' 'teacher' 'code' %}"> <div class="course-box">Student Id</div> </a>
+            <a href="{% url 'students' 'teacher' 'last_name' %}"><div class="course-box">Name</div></a>
+            <a href="{% url 'students' 'teacher' 'level' %}"><div class="course-box">Level</div></a>
+            <a href="{% url 'students' 'teacher' 'course_count' %}"><div class="course-box">Courses</div></a>
+            <div class="course-box">Links</div>
+            {% elif admitted == False %}
+            <a href="{% url 'students' 'nonadmitted' 'code' %}"> <div class="course-box">Student Id</div> </a>
+            <a href="{% url 'students' 'nonadmitted' 'last_name' %}"><div class="course-box">Name</div></a>
+            <a href="{% url 'students' 'nonadmitted' 'level' %}"><div class="course-box">Level</div></a>
+            <a href="{% url 'students' 'nonadmitted' 'course_count' %}"><div class="course-box">Nonadmission Type</div></a>
+            <div class="course-box">Links</div>
+            {% endif %}
+            </div>
+            <hr>
+            {% if student_count != 0 %}
+                {% for student in students %}
+                        <div class="course-row">
+                            {% if student.code %}
+                            <div class="course-box">{{student.code}}</div>
+                            {% else %}
+                            <div class="course-box"></div>
+                            {% endif %}
+                            <div class="course-box">{{student.last_name}}, {{student.first_name}}</div>
+                            <div class="course-box">{{student.level}}</div>
+                            {% if admitted == True %}
+                            <div class="course-box">{{student.course_count}}</div>
+                            {% else %}
+                            <div class="course-box">{{student.nonadmission_type}}</div>
+                            {% endif %}
+                            <div class="course-box">
+                                    <a class="button" href="{% url 'student' student.code %}">More info</a>
+                                    <hr>
+                                    <!--{% if user.is_teacher.id or user.is_admin %}
+                                    <a class="button" href="{% url 'gradebook' student.code %}">Gradebook</a>
+                                    {% endif %}-->
+                            </div>
+                        </div>
+                {% endfor %}
+            {% else %}
+                {% if all %}
+                <h4>There are currently no students associated with this school. </a></h4>
+                {% else %}
+                <h4>You have no students at this time. Add students in the school student directory or contact your school admin.</h4>
+                {% endif %}
+            {% endif %}
+            </div>
+    </div>
 </body>
 {% endblock %}

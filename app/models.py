@@ -48,6 +48,8 @@ class Course(models.Model):
     school = models.ForeignKey('School', on_delete=models.CASCADE, related_name='facility', null=False)
     teacher = models.ForeignKey('User', on_delete=models.SET_NULL, related_name='teacher', null=True, blank=True)
     added_by = models.ForeignKey('User', on_delete=models.CASCADE, related_name='course_added_by', null=True, blank=True)
+    students_enrolled = models.ManyToManyField('Student', related_name='course_students')
+
     #required fields for object to be created
     name = models.CharField(max_length=64, blank=False, null=True) #name of class
     subject = models.CharField(max_length=128, blank=False) #subject of class
@@ -98,6 +100,8 @@ class Course(models.Model):
 class Student(models.Model):
     #key models
     school = models.ForeignKey('School', on_delete=models.CASCADE, related_name='student') #DO NOT delete student info unless specified upon data deletion
+    teachers = models.ManyToManyField('User', related_name='student_teachers')
+    courses = models.ManyToManyField('Course', related_name='student_Courses')
     added_by = models.ForeignKey('User', on_delete=models.CASCADE, related_name='student_added_by', null=True, blank=True)
     
     #required Fields
@@ -105,11 +109,16 @@ class Student(models.Model):
     last_name = models.CharField(max_length=64, blank=False, null=True)
     birthday = models.DateField(auto_now_add=False, blank=False, null=True)
     level = models.CharField(max_length=2, blank=False, null=True)
+    contact = models.CharField(max_length=64, blank=False, null=True)
 
     #optional Fields
+    course_count = models.PositiveIntegerField(blank=True, null=True, default=0)
     code = models.CharField(max_length=64, blank=True, null=True)
-    joined = models.DateField(auto_now_add=False, blank=True, null=True)
-    released = models.DateField(auto_now_add=False, blank=True, null=True)
+    start_date = models.DateField(auto_now_add=False, blank=True, null=True)
+    end_date = models.DateField(auto_now_add=False, blank=True, null=True)
+
+    admitted = models.BooleanField(default=True, blank=True, null=True)
+    nonadmission_type = models.CharField(max_length=12, blank=True, null=True)
 
     timestamp = models.DateTimeField(auto_now_add=True)
 
@@ -213,6 +222,7 @@ class Grade(models.Model):
     #key fields
     student = models.ForeignKey('Student', on_delete=models.CASCADE, related_name='grade', null=False)
     assignment = models.ForeignKey('Assignment', on_delete=models.CASCADE, related_name='assignmentGrade', null=True)
+    course = models.ForeignKey('Course', on_delete=models.CASCADE, related_name="assignment_grade", null=True)
     
     #required Fields
     year = models.IntegerField(default=0, blank=False, null=True) #used for calculating final score
