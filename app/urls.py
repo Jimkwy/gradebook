@@ -24,7 +24,8 @@ urlpatterns = [
     path("courses/all/<str:source>/sort/<str:sortby>", views.courses, name="courses"),
     path("courses/moreinfo/<str:course_code>", views.course, name="course"),
     path("courses/course", views.addCourse, name="addCourse"),
-    path("courses/course/<str:course_id>", views.addCourse, name="addCourse"),
+    path("courses/course/<str:course_code>", views.addCourse, name="addCourse"),
+    path("courses/course/<str:course_code>", views.removeCourse, name="removeCourse"),
 
     #gradebook routes
     path("gradebook/<str:course>", views.gradebook, name="gradebook"),

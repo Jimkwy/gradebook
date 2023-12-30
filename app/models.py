@@ -51,7 +51,7 @@ class Course(models.Model):
     #required fields for object to be created
     name = models.CharField(max_length=64, blank=False, null=True) #name of class
     subject = models.CharField(max_length=128, blank=False) #subject of class
-    grade_type = models.BooleanField(default=0, blank=False) #used to set grading system
+    grade_type = models.PositiveIntegerField(default=0, blank=False) #used to set grading system
                                                              #grading systems: True= points/percent, False= letter (A-f, incomplete or complete, etc)
     
     

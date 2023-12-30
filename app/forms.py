@@ -7,9 +7,14 @@ class CourseForm(forms.ModelForm):
 
     class Meta():
         model = Course
-        fields = ('teacher','name','subject','level', 'description', 'start_time', 'end_time', 'start_date', 'end_date')
+        fields = ('teacher','name','subject','level', 'grade_type','description', 'start_time', 'end_time', 'start_date', 'end_date')
 
         widgets = {
+            'grade_type': forms.Select(choices = (
+            (0, 'Point/Percent System (0%-100%)'),
+            (1, 'Letter Grade System (A-F, Complete/Incomplete, etc.)'),
+            (2, 'Point/Lettergrade Combination')
+        )),
             'start_date': forms.DateInput(attrs={'type': 'date'}),
             'end_date': forms.DateInput(attrs={'type': 'date'}),
             'start_time': forms.TimeInput(attrs={'type': 'time'}),

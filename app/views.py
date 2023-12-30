@@ -383,7 +383,7 @@ def course(request, course_code):
 
 @csrf_exempt
 @login_required
-def addCourse(request, course_id = None):
+def addCourse(request, course_code = None):
     #initialize data
     user = request.user
     school = user.school
@@ -396,8 +396,8 @@ def addCourse(request, course_id = None):
             if user.is_admin:
                 #get all form information
                 course = ()
-                if course_id != None:
-                    course = Course.objects.get(code=course_id)
+                if course_code != None:
+                    course = Course.objects.get(code=course_code)
                     form = CourseForm(school, request.POST, instance=course)
                     # check if form data is valid
                     if form.is_valid():
@@ -413,6 +413,7 @@ def addCourse(request, course_id = None):
                         course_model = form.save(commit=False)
                         course_model.school = school
                         course_model.code = accessCodeGen('course')
+                        course_model.added_by = user
                         course_model.save()       
     
         return HttpResponseRedirect(reverse("courses"))
@@ -422,10 +423,10 @@ def addCourse(request, course_id = None):
         #check if user has admin access
         if user.is_admin:
             #check for course code, if so auto fill course info
-            if course_id != None:
+            if course_code != None:
                 #generate filled form
                 edit = True
-                course = Course.objects.get(code=course_id)
+                course = Course.objects.get(code=course_code)
                 form = CourseForm(instance=course, school=school)
                 courses = Course.objects.filter(teacher=user).order_by('start_time')
                 return render(request, "app/courses/addCourse.html", {'form': form,
@@ -442,7 +443,17 @@ def addCourse(request, course_id = None):
                 
     #if all checks fail. Redirect.
     return HttpResponseRedirect(reverse("index"))
+
+@csrf_exempt
+@login_required
+def removeCourse(request, course_code):
+    #initalize user course and school
+    user = request.user
+    school = user.school
+    course = Course.objects.get(code=course_code)
+
     
+
 #gradebook views
 @csrf_exempt
 @login_required

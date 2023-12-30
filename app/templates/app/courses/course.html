@@ -40,10 +40,19 @@
 <h5>Other Course information</h5>
 <hr>
 <div class="course-row">
+    {% if course.grade_type == 0 %}
+    <div class="course-box">Point/Percent System (0%-100%)</div>
+    {% elif course.grade == 1 %}
+    <div class="course-box">Letter Grade System (A-F, Complete/Incomplete, etc.)</div>
+    {% elif course.grade == 1 %}
+    <div class="course-box">Point/Lettergrade Combination</div>
+    {% endif %}
     <div class="course-box">{{course.description}}</div>
 </div>
+{% if user.is_admin %}
 <div class="course-row">
-    Course added on {{course.timestamp}} by {{course.admin}}
+    Course added on {{course.timestamp}} by {{course.added_by}}
 </div>
+{% endif %}
 </body>
 {% endblock %}
