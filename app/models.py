@@ -48,7 +48,7 @@ class Course(models.Model):
     school = models.ForeignKey('School', on_delete=models.CASCADE, related_name='facility', null=False)
     teacher = models.ForeignKey('User', on_delete=models.SET_NULL, related_name='teacher', null=True, blank=True)
     added_by = models.ForeignKey('User', on_delete=models.CASCADE, related_name='course_added_by', null=True, blank=True)
-    students_enrolled = models.ManyToManyField('Student', related_name='course_students')
+    students = models.ManyToManyField('Student', related_name='course_students', blank=True)
 
     #required fields for object to be created
     name = models.CharField(max_length=64, blank=False, null=True) #name of class
@@ -64,8 +64,10 @@ class Course(models.Model):
     online = models.BooleanField(default=False, blank=True, null=True) #if course is online(true) or inperson (false)
     location = models.CharField(max_length=128, blank=True, null=True) #physical location of class if any
 
-    #keep track of student number in class
-    students = models.PositiveIntegerField(blank=True, null=True, default=0)
+    #keep track of student number in class and enroilment forms
+    student_count = models.PositiveIntegerField(blank=True, null=True, default=0)
+    max_students = models.PositiveBigIntegerField(blank=True, null=True, default=0)
+    open = models.BooleanField(default=True)
 
     #scheduling dates and times for the class, editable
     start_date = models.DateField(auto_now_add=False, blank=True, null=True)
@@ -100,10 +102,9 @@ class Course(models.Model):
 class Student(models.Model):
     #key models
     school = models.ForeignKey('School', on_delete=models.CASCADE, related_name='student') #DO NOT delete student info unless specified upon data deletion
-    teachers = models.ManyToManyField('User', related_name='student_teachers')
-    courses = models.ManyToManyField('Course', related_name='student_Courses')
+    courses = models.ManyToManyField('Course', related_name='student_Courses', blank=True)
     added_by = models.ForeignKey('User', on_delete=models.CASCADE, related_name='student_added_by', null=True, blank=True)
-    
+    grades = models.ManyToManyField('Grade', related_name='grades_student', blank=False)
     #required Fields
     first_name = models.CharField(max_length=64, blank=False, null=True)
     last_name = models.CharField(max_length=64, blank=False, null=True)
@@ -138,21 +139,6 @@ class Student(models.Model):
             "joined": self.joined,
             "released": self.released,
         }
-
-#model for linking courses and students to better abstract lookup and improve lookup speeds. 
-    #child of both student and course. (both are nessesary for linking models)
-class StudentCourse(models.Model):
-    #key Fields
-    student = models.ForeignKey('Student', on_delete=models.CASCADE, related_name='admit', null=False)
-    course = models.ForeignKey('Course', on_delete=models.CASCADE, related_name='admission', null=False)
-    
-    #required Fields
-    admission_date = models.DateField(auto_now_add=False, blank=False, null=True)
-    status = models.BooleanField(default=True, blank=False)
-
-    #display settings in site admin backend
-    def __str__(self):
-        return f"{self.course, self.student}"
 
 #model for student attendance w/ student id, date, event id
     #child of student models
@@ -196,6 +182,8 @@ class Assignment(models.Model):
     
     #Required fields
     name = models.CharField(max_length=64, blank=False, default='none')
+    assigned_date = models.DateField(auto_now_add=False, blank=True, null=True)
+    due_date = models.DateField(auto_now_add=False, blank=True, null=True)
 
     #dependant on grading system for the course - still required to set grade value
     letter = models.CharField(max_length=12, default='None', blank=False)
@@ -221,14 +209,13 @@ class Assignment(models.Model):
 class Grade(models.Model):
     #key fields
     student = models.ForeignKey('Student', on_delete=models.CASCADE, related_name='grade', null=False)
-    assignment = models.ForeignKey('Assignment', on_delete=models.CASCADE, related_name='assignmentGrade', null=True)
-    course = models.ForeignKey('Course', on_delete=models.CASCADE, related_name="assignment_grade", null=True)
-    
+    assignment = models.ForeignKey('Assignment', on_delete=models.SET_NULL, related_name='assignmentGrade', null=True)
+    course = models.ForeignKey('Course', on_delete=models.SET_NULL, related_name='gradeCourse', null=True)
     #required Fields
-    year = models.IntegerField(default=0, blank=False, null=True) #used for calculating final score
-    semester = models.IntegerField(default=1, blank=False, null=True) #used for calculating semester final scores
+    year = models.IntegerField(default=0, blank=True, null=True) #used for calculating final score
+    semester = models.IntegerField(default=1, blank=True, null=True) #used for calculating semester final scores
     date = models.DateField(auto_now_add=False, blank=True, null=True) #used for calculating averages
-    notes = models.CharField(max_length=516, default='None', blank=False)
+    notes = models.CharField(max_length=516, blank=True)
 
     #dependant on grading system type
     grade_value = models.IntegerField(default=0, blank=False) #used for point/percent calcultions if point systems are used
@@ -238,7 +225,7 @@ class Grade(models.Model):
 
     #display settings in site admin backend
     def __str__(self):
-        return f"{self.student + ' ' + self.assignment + ' year' + self.year + ' semester' + self.semester}"
+        return f"{self.student}"
 
     def serializer(self):
         return {
@@ -252,9 +239,6 @@ class Grade(models.Model):
             "grade_value": self.grade_value,
             "grade_letter": self.grade_letter
         }
-    
-    def __str__(self):
-        return f"{self.topic}"
 
 #model for overall course grade that cumilates all grades
 class CourseGrade(models.Model):

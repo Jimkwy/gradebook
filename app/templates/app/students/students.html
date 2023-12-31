@@ -88,9 +88,9 @@
                             <div class="course-box">
                                     <a class="button" href="{% url 'student' student.code %}">More info</a>
                                     <hr>
-                                    <!--{% if user.is_teacher.id or user.is_admin %}
-                                    <a class="button" href="{% url 'gradebook' student.code %}">Gradebook</a>
-                                    {% endif %}-->
+                                    {% if user.is_admin %}
+                                    <a href="{% url 'enrollStudent' student.code %}">Enroll Courses</a>
+                                    {% endif %}
                             </div>
                         </div>
                 {% endfor %}

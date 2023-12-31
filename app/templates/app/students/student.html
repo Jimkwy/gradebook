@@ -8,6 +8,12 @@
 <body>
     <h4>student: {{student.last_name}}, {{student.first_name}}</h4>
     {% if user.is_admin %}
+    <button>
+        <a href="{% url 'enrollStudent' student.code %}">Enroll Courses</a>
+    </button>
+    <button>
+        <a href="{% url 'dropStudent' student.code %}">Remove Courses</a>
+    </button>
     <button type="button">
         <a href="{% url 'addStudent' student.code %}">Edit student</a>
     </button>

@@ -22,14 +22,15 @@ urlpatterns = [
     path("students/addstudent", views.addStudent, name="addStudent"),
     path("students/editstudent/<int:student_code>", views.addStudent, name="addStudent"),
     path("students/removestudent/<int:student_code>", views.removeStudent, name="removeStudent"),
-    
 
     #course admission routes
-    path("courses/enroll/<str:course_code>", views.enroll, name="enroll"),
-    path("courses/drop/<str:student_code>", views.drop, name="drop"),
+    path("courses/enroll/student/<str:student_code>", views.enroll, name="enrollStudent"),
+    path("courses/enroll/course/<str:course_code>", views.enroll, name="enrollCourse"),
+    path("courses/drop/student/<str:student_code>", views.drop, name="dropStudent"),
+    path("courses/drop/courses/<str:course_code>", views.drop, name="dropCourse"),
     path("students/student/course-list/<str:student_code", views.courses, name="courses"),
 
-    #course and gradebook routes
+    #course
     path("courses/directory/", views.courses, name="courses"),
     path("courses/directory/<str:source>/", views.courses, name="courses"),
     path("courses/all/<str:source>/sort/<str:sortby>", views.courses, name="courses"),
@@ -39,7 +40,10 @@ urlpatterns = [
     path("courses/removecourse/<str:course_code>", views.removeCourse, name="removeCourse"),
 
     #gradebook routes
-    path("gradebook/<str:course>", views.gradebook, name="gradebook"),
+    path("gradebook/<str:course_id>", views.gradebook, name="gradebook"),
+    path("gradebook/add-asignment/<str:course_code>", views.assignment, name="addAssignment"),
+    path("gradebook/edit-asignment/<str:course_code>/<int:assignment_id>", views.assignment, name="editAssignment"),
+     path("gradebook/add-grade/<int:assignment_id>/<str:student_code>", views.addGrade, name="addGrade"),
     
     #API routes
 

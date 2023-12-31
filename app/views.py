@@ -7,9 +7,9 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 
 from .user import User
-from .models import School, Course, Student, StudentCourse, Attendance, Assignment, Grade, CourseGrade
+from .models import School, Course, Student, Attendance, Assignment, Grade, CourseGrade
 from .helpers import accessCodeGen
-from .forms import CourseForm, StudentForm, CourseEnrollForm
+from .forms import CourseForm, StudentForm, AssignmentForm, GradeForm
 
 #main site views
 @csrf_exempt
@@ -22,8 +22,8 @@ def index(request):
         if user.school:
             #check if user is a teacher
             if user.is_teacher:
-                #load data necesary for page load and general usage
-                courses = Course.objects.filter(teacher=user.id).order_by('start_time')
+                #pull teacher courses for nav
+                courses = Course.objects.filter(teacher=user).order_by('start_time')
                 return render(request, "app/index.html", {'courses': courses})
             else: 
                 return render(request, "app/index.html")
@@ -40,8 +40,8 @@ def settings(request):
     user = request.user
         
     if user.school:
-        #load data necesary for page load and general usage
-        courses = Course.objects.filter(teacher=user.id).order_by('start_time')
+        #pull teacher courses for nav
+        courses = Course.objects.filter(teacher=user).order_by('start_time')
         
         if user == user.school.master:
             admins = user.school.admins.all()
@@ -198,7 +198,8 @@ def leaveSchool(request):
         if user.school.master == user:
             return HttpResponseRedirect(reverse("index"))
         else:
-            courses = Course.objects.filter(teacher=user)
+            #pull teacher courses for nav
+            courses = Course.objects.filter(teacher=user).order_by('start_time')
             course_count = len(courses)
             return render(request, "app/school/leaveSchool.html", {"courses": courses,
                                                                    "course_count": courses})
@@ -289,27 +290,25 @@ def students(request, source='school', sortby='last_name'):
                 #load data associated with school admitted students
                 students = Student.objects.filter(school=school, admitted=True).order_by(sortby)
                 student_count = len(students)
-                courses = Course.objects.filter(teacher=user).order_by('start_time')
                 admitted == True
                 all = True
             elif source == 'teacher':
                 #load data associated with teacher admitted students
                 students = Student.objects.filter(school=school, teachers__id=user.id, admitted=True).order_by(sortby)
                 student_count = len(students)
-                courses = Course.objects.filter(teacher=user).order_by('start_time')
                 admitted == True
             elif source == 'nonadmitted' and user.is_admin:
                 #load data associated with user/teacher/parent
                 students = Student.objects.filter(school=school, admitted=False).order_by(sortby)
                 student_count = len(students)
-                courses = Course.objects.filter(teacher=user).order_by('start_time')
                 admitted = False
                 all = True
         except:
             #load data associated with user/teacher/parent
             return HttpResponseRedirect(reverse("index"))
         #render
-        print(admitted)
+        #pull teacher courses for nav
+        courses = Course.objects.filter(teacher=user).order_by('start_time')
         return render(request, "app/students/students.html", {'courses':courses,
                                                               'student_count':student_count,
                                                                 'students':students,
@@ -329,6 +328,7 @@ def student(request, student_code):
     if user.school:
         student = Student.objects.get(code=student_code, school=school)
         if student.school == user.school:
+            #pull teacher courses for nav
             courses = Course.objects.filter(teacher=user).order_by('start_time')
             return render(request, "app/students/student.html",{'student':student,
                                                               'courses':courses})
@@ -378,6 +378,7 @@ def addStudent(request, student_code = None):
                     edit = True
                     student = Student.objects.get(code=student_code, school=school)
                     form = StudentForm(instance=student)
+                    #pull teacher courses for nav
                     courses = Course.objects.filter(teacher=user).order_by('start_time')
                     return render(request, "app/students/addStudent.html", {'form': form,
                                                                         'edit': edit,
@@ -387,6 +388,7 @@ def addStudent(request, student_code = None):
                 else:
                     #generate form with school object to limit teacher options to school related users
                     form = StudentForm()
+                    #pull teacher courses for nav
                     courses = Course.objects.filter(teacher=user).order_by('start_time')
                     return render(request, "app/students/addStudent.html", {'form': form,
                                                                         'courses':courses})
@@ -447,6 +449,7 @@ def courses(request, source=None, sortby=None):
                     courses_list = Course.objects.filter(school=user.school).order_by('teacher', 'start_time')
                 else:
                     courses_list = Course.objects.filter(school=user.school).order_by(sortby)
+                #pull teacher courses for nav
                 courses = Course.objects.filter(teacher=user).order_by('start_time')
                 course_count = len(courses_list)
                 all = True
@@ -480,12 +483,16 @@ def course(request, course_code):
     user = request.user
     #authenticate if user is related to school then pull course object
     if user.school:
-        course = Course.objects.get(code=course_code)
-        if course.school == user.school:
-            courses = Course.objects.filter(teacher=user).order_by('start_time')
-            return render(request, "app/courses/course.html",{'course':course,
-                                                              'courses':courses})
-        return HttpResponseRedirect(reverse("courses"))
+        school= user.school
+
+        course = Course.objects.get(code=course_code, school=school)
+        #load enrolled students
+        
+        print(course.students)
+        courses = Course.objects.filter(teacher=user).order_by('start_time')
+        return render(request, "app/courses/course.html",{'course':course,
+                                                          'students':students,
+                                                            'courses':courses})
     return HttpResponseRedirect(reverse("index"))
 
 @csrf_exempt
@@ -541,6 +548,7 @@ def addCourse(request, course_code = None):
                 else:
                     #generate form with school object to limit teacher options to school related users
                     form = CourseForm(school, initial={'school': school})
+                    #pull teacher courses for nav
                     courses = Course.objects.filter(teacher=user).order_by('start_time')
                     return render(request, "app/courses/addCourse.html", {'form': form,
                                                                         'courses':courses})
@@ -588,64 +596,316 @@ def removeCourse(request, course_code):
 #course admission routes
 @csrf_exempt
 @login_required
-def enroll(request, course_code):
+def enroll(request, course_code=None, student_code=None):
     #initialize user
     user = request.user
     #check if user has permissions
     if user.is_admin and user.school:
         #initalize data required for function
         school = user.school
-        course = Course.objects.get(code=course_code, school=school)
-            
+        #variable for handling student/course enroll setup
+        enroll_course = False
         #check if request is post
         if request.method == 'POST':
-            print('check')
+            
+            #if a specific course is specified, pull course, and students
             if course_code != None:
-                form = CourseEnrollForm(course, school, request.POST, instance=course)
                 
-                # check if form data is valid
-                if form.is_valid():
-                    # save the form data to model
-                    form.save()
-                    course.students = course.students_enrolled.count()
-                    students = course.students_enrolled.all()
-                    for student in students:
+                course = Course.objects.get(code=course_code, school=school)
+                student_list = Student.objects.filter(school=school, admitted=True).exclude(id__in=course.students.values_list('id', flat=True))
+                for student in student_list:
+                    try:
+                        student_code = request.POST.get(student.code)
+                        student = Student.objects.get(code=student_code,school=school)
                         student.courses.add(course)
                         student.course_count = student.courses.count()
-    
+                        student.save()
+                        course.students.add(student)
+                    except:
+                        continue
+                course.course_count = course.students.count()
+                course.save()
+            #if student is specified, pull open courses and student
+            elif student_code != None:
+                student = Student.objects.get(code=student_code, school=school)
+                course_list = Course.objects.filter(school=school, open=True).exclude(id__in=student.courses.values_list('id', flat=True))
+                for course in course_list:
+                    try:
+                        course_code = request.POST[course.code]
+                        course = Course.objects.get(code=course_code,school=school)
+                        course.students.add(student)
+                        course.student_count = course.students.count()
+                        course.save()
+                        student.courses.add(course)
+                    except:
+                        continue
+                student.course_count = student.courses.count()
+                student.save()
+            #if student code specified, pull student
+            else:
+                #if neither is provided, redirect
+                return HttpResponseRedirect(reverse("index"))
             return HttpResponseRedirect(reverse("courses"))
         
         else:
-            #generate form with school object to limit teacher options to school related users
-            form = CourseEnrollForm(course, school, instance=course)
+            #if a specific course is specified, pull course, and students
+            if course_code != None:
+                course_list = Course.objects.get(code=course_code, school=school)
+                student_list = Student.objects.filter(school=school, admitted=True).exclude(id__in=course_list.students.values_list('id', flat=True))
+                enroll_course = True
+            #if student is specified, pull open courses and student
+            elif student_code != None:
+                student_list = Student.objects.get(code=student_code, school=school)
+                course_list = Course.objects.filter(school=school, open=True).exclude(id__in=student_list.courses.values_list('id', flat=True))
+                enroll_course = False
+            #if student code specified, pull student
+            else:
+                #if neither is provided, redirect
+                return HttpResponseRedirect(reverse("index"))
+
+            #pull teacher courses for nav
             courses = Course.objects.filter(teacher=user).order_by('start_time')
-            return render(request, "app/courses/enroll.html", {'form': form,
-                                                                  'course': course,
+            return render(request, "app/courses/enroll.html", {'course_list':course_list,
+                                                                  'student_list': student_list,
+                                                                  'enroll_course': enroll_course,
                                                                     'courses':courses})
     else:
         return HttpResponseRedirect(reverse("index"))
 
 @csrf_exempt
 @login_required
-def drop(request, course_code):
-    return HttpResponseRedirect(reverse("index"))
+def drop(request, course_code=None, student_code=None):
+    #initialize user
+    user = request.user
+    #check if user has permissions
+    if user.is_admin and user.school:
+        #initalize data required for function
+        school = user.school
+        #variable for handling student/course drop setup
+        drop_course = False
+        #check if request is post
+        if request.method == 'POST':
+            #if a specific course is specified, pull course, and students
+            if course_code != None:
+                course = Course.objects.get(code=course_code, school=school)
+                student_list = course.students.all()
+                for student in student_list:
+                    try:
+                        student_code = request.POST[student.code]
+                        student.courses.remove(course)
+                        student.course_count = student.courses.count()
+                        student.save()
+                        course.students.remove(student)
+                    except:
+                        continue
+                course.course_count = course.students.count()
+                course.save()
+            #if student is specified, pull open courses and student
+            elif student_code != None:
+                student = Student.objects.get(code=student_code, school=school)
+                course_list = student.courses.all()
+                for course in course_list:
+                    try:
+                        course_code = request.POST[course.code]
+                        course = Course.objects.get(code=course_code,school=school)
+                        course.students.remove(student)
+                        course.student_count = course.students.count()
+                        course.save()
+                        student.courses.remove(course)
+                    except:
+                        continue
+                student.course_count = student.courses.count()
+                student.save()
+            #if student code specified, pull student
+            else:
+                #if neither is provided, redirect
+                return HttpResponseRedirect(reverse("index"))
+            return HttpResponseRedirect(reverse("courses"))
+        
+        else:
+            #if a specific course is specified, pull course, and students
+            if course_code != None:
+                course_list = Course.objects.get(code=course_code, school=school)
+                student_list = course_list.students.all()
+                drop_course = True
+            #if student is specified, pull open courses and student
+            elif student_code != None:
+                student_list = Student.objects.get(code=student_code, school=school)
+                course_list = student_list.courses.all()
+                drop_course = False
+            #if student code specified, pull student
+            else:
+                #if neither is provided, redirect
+                return HttpResponseRedirect(reverse("index"))
+
+            #pull teacher courses for nav
+            courses = Course.objects.filter(teacher=user).order_by('start_time')
+            return render(request, "app/courses/drop.html", {'course_list':course_list,
+                                                                  'student_list': student_list,
+                                                                  'drop_course': drop_course,
+                                                                    'courses':courses})
+    else:
+        return HttpResponseRedirect(reverse("index"))
 
 #gradebook views
 @csrf_exempt
 @login_required
-def gradebook(request, course):
+def gradebook(request, course_id):
     #initialize user
     user = request.user
     #authenticate if user is related to school then pull course object
-    if user.school:
-        course = Course.objects.get(code=course)
-        if course.school == user.school:
+    if user.school and user.is_teacher:
+        course = Course.objects.get(code=course_id, school=user.school)
+        if course.teacher == user or user.is_admin:
+            #load students and assignments
+            students = course.students.all()
+            assignments = Assignment.objects.filter(course=course)
+            #pull teacher courses for nav
             courses = Course.objects.filter(teacher=user).order_by('start_time')
+            grades = []
+            for student in students:
+                grade = student.grades.all()
+                if grade:
+                    grades.append(grade)
             return render(request, "app/gradebook/gradebook.html",{'course':course,
-                                                         'courses':courses})
+                                                         'students':students,
+                                                         'assignments':assignments,
+                                                         'courses':courses, 
+                                                         'grades':grades})
         return HttpResponseRedirect(reverse("courses"))
     return HttpResponseRedirect(reverse("index"))
 
+@csrf_exempt
+@login_required
+def assignment(request, course_code, assignment_id=None):
+   #initialize user
+    user = request.user
+    #authenticate if user is related to school then pull course object
+    if user.school and user.is_teacher:
+        #load course and authenticate is teacher of course
+        course = Course.objects.get(code=course_code, school=user.school)
+        if course.teacher == user or user.is_admin:
+            #check if submition is POST
+            if request.method == 'POST':
+                #initalize course
+                assignment = ()
+                if assignment_id != None:
+                    assignment = Assignment.objects.get(id=assignment_id)
+                    form = CourseForm(request.POST, instance=assignment)
+                    # check if form data is valid
+                    if form.is_valid():
+                        # save the form data to model
+                        form.save()       
+
+                else:
+                    form = AssignmentForm(request.POST)
+                    # check if form data is valid
+                    if form.is_valid():
+                        # save the form data to model
+                        assignment_model = form.save(commit=False)
+                        assignment_model.course = course
+                        assignment_model.save()       
+        
+                return HttpResponseRedirect(reverse("courses"))
+                    
+            #if GET check if user has a related school
+            else:
+
+                if assignment_id != None:
+                    #generate form
+                    edit = True
+                    assignment = Assignment.objects.get(id=assignment_id, course=course)
+                    form = AssignmentForm(instance=assignment)
+                    courses = Course.objects.filter(teacher=user).order_by('start_time')
+                    return render(request, "app/gradebook/assignment.html", {'form': form,
+                                                                        'edit': edit,
+                                                                        'course': course,
+                                                                        'courses':courses})
+                #if no assignment code, generate blank form
+                else:
+                    #generate form with school object to limit teacher options to school related users
+                    form = AssignmentForm()
+                    course = Course.objects.get(code=course_code, school=user.school)
+                    #pull teacher courses for nav
+                    courses = Course.objects.filter(teacher=user).order_by('start_time')
+                    return render(request, "app/gradebook/assignment.html", {'form': form,
+                                                                             'course':course,
+                                                                            'courses':courses})
+        else:           
+            #if all checks fail. Redirect.
+            return HttpResponseRedirect(reverse("index"))
+    
+    return HttpResponseRedirect(reverse("index"))
+
+@csrf_exempt
+@login_required
+def addGrade(request, assignment_id, student_code, grade_id=None):
+    #initialize user
+    user=request.user
+    #check for permissions
+    if user.is_teacher and user.school:
+        #initalize student and assignment
+        student = Student.objects.get(code=student_code, school=user.school)
+        assignment = Assignment.objects.get(id=assignment_id)
+        #pull course for redirect
+        course = assignment.course
+        print(assignment)
+        if request.method == 'POST':
+            grade = ()
+            if grade_id != None:
+                grade = Grade.objects.get(id=grade_id)
+                form = GradeForm(request.POST, instance=grade)
+                # check if form data is valid
+                if form.is_valid():
+                    # save the form data to model
+                    form.save()       
+
+            else:
+                #initalize
+                form = GradeForm(request.POST)
+                # check if form data is valid
+                if form.is_valid():
+                    try: # save the form data to model
+                        grade_model = form.save(commit=False)
+                        grade_model.assignment = assignment
+                        grade_model.student = student
+                        grade_model.save()
+                        return HttpResponseRedirect(reverse("gradebook", course.code))
+                    
+                    except:
+                        return HttpResponseRedirect(reverse("index"))
+
+                else:
+                    return HttpResponseRedirect(reverse("index"))
+                    
+        #if GET check if user has a related school
+        else:
+            if grade_id != None:
+                #generate form
+                edit = True
+                grade = Grade.objects.get(id=grade_id, student=student)
+                form = GradeForm(instance=grade)
+                #pull teacher courses for nav
+                courses = Course.objects.filter(teacher=user).order_by('start_time')
+                return render(request, "app/gradebook/grade.html", {'form': form,
+                                                                    'edit': edit,
+                                                                    'student': student,
+                                                                        'assignment':assignment,
+                                                                        'courses':courses})
+            else:
+                #generate form with school object to limit teacher options to school related users
+                form = GradeForm()
+                #pull teacher courses for nav
+                
+                courses = Course.objects.filter(teacher=user).order_by('start_time')
+                return render(request, "app/gradebook/grade.html", {'form': form,
+                                                                         'student': student,
+                                                                        'assignment':assignment,
+                                                                        'courses':courses})
+    else:           
+        #if all checks fail. Redirect.
+        return HttpResponseRedirect(reverse("index"))
+    return HttpResponseRedirect(reverse("index"))
 #API views
 #all api routes are temporary csrf_exempt for the sake of functionality testing
 

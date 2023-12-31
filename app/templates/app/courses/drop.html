@@ -2,17 +2,17 @@
 {% load static %}
 
 {% block title %}
-<title>gradebook: Enroll</title>
+<title>gradebook: drop</title>
 {% endblock title %}
 {% block body %}
 <body>
     <div>
-        {% if enroll_course %}
-            <h4>Enroll Students </h4>
+        {% if drop_course %}
+            <h4>drop Students </h4>
             <h4>Course: {{course_list.name}} {{course_list.subject}} </h4>
             <h5>Code: {{course_list.code}}</h5>
             <hr>
-            <form action="{%url 'enrollCourse' course_list.code %}" method="post">
+            <form action="{%url 'dropCourse' course_list.code %}" method="post">
                 <div class="course-row">
                     <div class="course-block">
                         <h4>Select Students:<input id="submit" type="submit" class="button"/></h4>
@@ -27,11 +27,11 @@
                 </div>
             </form>
         {% else %}
-            <h4>Enroll Courses</h4>
+            <h4>drop Courses</h4>
             <h4>Student: {{student_list.last_name}}, {{student_list.first_name}} </h4>
             <h5>Code: {{student_list.code}}</h5>
             <hr>
-            <form action="{%url 'enrollStudent' student_list.code %}" method="post">
+            <form action="{%url 'dropStudent' student_list.code %}" method="post">
                 <div class="course-row">
                     <div class="course-block" style="overflow:auto">
                         <h4>Select Course:<input id="submit" type="submit" class="button"/></h4>

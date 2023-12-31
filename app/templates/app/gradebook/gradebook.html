@@ -6,6 +6,45 @@
 {% endblock title %}
 {% block body %}
 <body>
-    {{course.name}}
+    <button>
+        <a href="{% url 'addAssignment' course.code %}">Add assignment</a>
+    </button>
+    <div class="course-row">
+        <div class="course-box">
+            Student
+        </div>
+        {% for assignment in assignments %}
+            <div class="course-box">
+                <br>
+                {{assignment.name}}<br>
+                Due Date: {{assignment.due_date}}<br>
+                Value: {{assignment.max_score}}
+            </div>
+        {% endfor %}
+    </div>
+    {% for student in students %}
+        <div class="course-row">
+            <div class="course-box">
+                {{student.code}}
+                <br>
+                {{student.last_name}}, {{student.first_name}}
+            </div>
+            {% for assignment in assignments %}
+            <div class="course-box">
+                {% if grades %}
+                {% for grade in grades %}
+                    {% if grade.student == student and grade.assignment == assignment %}
+                    {{ grade.value }}
+                    {% else %}
+                        <a href="{% url 'addGrade' assignment.id student.code %}">Add Grade</a>
+                    {% endif %}
+                {% endfor %}
+                {% else %}
+                    <a href="{% url 'addGrade' assignment.id student.code %}">Add Grade</a>
+                    {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
 </body>
 {% endblock %}

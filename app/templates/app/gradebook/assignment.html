@@ -1,0 +1,41 @@
+{% extends 'app/layout.html' %}
+{% load static %}
+
+{% block title %}
+{% if edit %}
+<title>gradebook: edit assignnment</title>
+{% else %}
+<title>gradebook:  add assignnment</title>
+{% endif %}
+{% endblock title %}
+{% block body %}
+<body>
+    <div>
+        {% if edit %}
+            <h4>Edit assignment</h4>
+            <h4>{{course.name}} {{course.subject}} </h4>
+            <h5>Code: {{course.code}}</h5>
+            <hr>
+        {% else %}
+            <h4>add assignment</h4>
+            <h4>{{course.name}} {{course.subject}} </h4>
+            <h5>Code: {{course.code}}</h5>
+            <hr><hr>
+        {% endif %}
+        <form action="" method="post">
+            <div class="form">
+                    {{ form }}
+                <div >
+                <input id="submit" type="submit" class="button"/>
+                <button class="button"><a class="button" href="{% url 'courses' 'school' %}">back</a></button>
+                </div>
+            </div>
+        </form>
+        {% if edit %}
+            <hr>
+            <h4>Remove Course From School</h4>
+            
+        {% endif %}
+    </div>
+</body>
+{% endblock %}

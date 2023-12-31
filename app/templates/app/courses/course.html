@@ -7,9 +7,17 @@
 {% block body %}
 <body>
     <h4>Course: {{course.name}}</h4>
+    {% if course.teacher.id == user.id or user.is_admin %}
+    <button>
+        <a class="button" href="{% url 'gradebook' course.code %}">Gradebook</a>
+    </button>
+    {% endif %}
     {% if user.is_admin %}
     <button>
-        <a href="{% url 'enroll' course.code %}">Enroll Student</a>
+        <a href="{% url 'enrollCourse' course.code %}">Enroll Students</a>
+    </button>
+    <button>
+        <a href="{% url 'dropCourse' course.code %}">Remove Students</a>
     </button>
     <button type="button">
         <a href="{% url 'addCourse' course.code %}">Edit Course</a>
@@ -32,7 +40,7 @@
     <div class="course-box">{{course.subject}}</div>
     <div class="course-box">{{course.level}}</div>
     <div class="course-box">{{course.location}}</div>
-    <div class="course-box">{{course.students}}</div>
+    <div class="course-box">{{course.student_count}}</div>
 </div>
 <h5>Course Times</h5>
 <hr>
@@ -58,6 +66,28 @@
 <div class="course-row">
     Course added on {{course.timestamp}} by {{course.added_by}}
 </div>
+{% endif %}
+{% if students != None %}
+    {% for student in students %}
+    <div class="course-row">
+        {% if student.code %}
+        <div class="course-box">{{student.code}}</div>
+        {% else %}
+        <div class="course-box"></div>
+        {% endif %}
+        <div class="course-box">{{student.last_name}}, {{student.first_name}}</div>
+        <div class="course-box">{{student.level}}</div>
+        {% if admitted == True %}
+        <div class="course-box">{{student.course_count}}</div>
+        {% else %}
+        <div class="course-box">{{student.nonadmission_type}}</div>
+        {% endif %}
+        <div class="course-box">
+            <a class="button" href="{% url 'student' student.code %}">More info</a>
+            <hr>
+        </div>
+    </div>
+    {% endfor %}
 {% endif %}
 </body>
 {% endblock %}

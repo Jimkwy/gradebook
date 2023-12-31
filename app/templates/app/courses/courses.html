@@ -22,7 +22,7 @@
         </button>
         {% endif %}
         <hr>
-        <div class="course-view" style="border:none;">
+        <div class="course-view" style="border:nne;">
             <div class="course-row">
                 {% if all == True %}
                 <a href="{% url 'courses' 'school' 'teacher' %}"> <div class="course-box">Teacher</div> </a>
@@ -64,6 +64,10 @@
                             <hr>
                             {% if course.teacher.id == user.id or user.is_admin %}
                             <a class="button" href="{% url 'gradebook' course.code %}">Gradebook</a>
+                            {% endif %}
+                            {% if user.is_admin %}
+                            <hr>
+                            <a href="{% url 'enrollCourse' course.code %}">Enroll Students</a>
                             {% endif %}
                     </div>
                 </div>
