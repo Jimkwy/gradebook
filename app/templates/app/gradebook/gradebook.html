@@ -13,35 +13,41 @@
         <div class="course-box">
             Student
         </div>
+        <div class="course-box">
+            Overall Grade
+        </div>
         {% for assignment in assignments %}
             <div class="course-box">
                 <br>
                 {{assignment.name}}<br>
-                Due Date: {{assignment.due_date}}<br>
                 Value: {{assignment.max_score}}
+                <button>
+                    <a href="{% url 'editAssignment' course.code assignment.id %}">Edit</a>
+                </button>
             </div>
         {% endfor %}
     </div>
     {% for student in students %}
         <div class="course-row">
             <div class="course-box">
-                {{student.code}}
-                <br>
                 {{student.last_name}}, {{student.first_name}}
+            </div>
+            <div class="course-box">
+                {% for g in courseGrades %}
+                    {% if g.student == student %}
+                        {{g.grade_percent}}%
+                    {% endif %}
+                {% endfor %}
             </div>
             {% for assignment in assignments %}
             <div class="course-box">
-                {% if grades %}
+               
                 {% for grade in grades %}
-                    {% if grade.student == student and grade.assignment == assignment %}
-                    {{ grade.value }}
-                    {% else %}
-                        <a href="{% url 'addGrade' assignment.id student.code %}">Add Grade</a>
+                    {% if grade.student == student and grade.assignment == assignment%}
+                        {{grade.grade}} / {{assignment.max_score}}
                     {% endif %}
                 {% endfor %}
-                {% else %}
-                    <a href="{% url 'addGrade' assignment.id student.code %}">Add Grade</a>
-                    {% endif %}
+                <a href="{% url 'addGrade' assignment.id student.code %}">Edit Grade</a>
             </div>
             {% endfor %}
         </div>

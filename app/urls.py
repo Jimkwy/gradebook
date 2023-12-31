@@ -40,7 +40,7 @@ urlpatterns = [
     path("courses/removecourse/<str:course_code>", views.removeCourse, name="removeCourse"),
 
     #gradebook routes
-    path("gradebook/<str:course_id>", views.gradebook, name="gradebook"),
+    path("gradebook/<str:course_code>", views.gradebook, name="gradebook"),
     path("gradebook/add-asignment/<str:course_code>", views.assignment, name="addAssignment"),
     path("gradebook/edit-asignment/<str:course_code>/<int:assignment_id>", views.assignment, name="editAssignment"),
      path("gradebook/add-grade/<int:assignment_id>/<str:student_code>", views.addGrade, name="addGrade"),

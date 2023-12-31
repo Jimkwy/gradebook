@@ -54,7 +54,7 @@ class GradeForm(forms.ModelForm):
 
     class Meta():
         model = Grade
-        fields = ('grade_value', 'date')
+        fields = ('grade', 'date')
 
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),

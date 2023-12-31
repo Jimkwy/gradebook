@@ -218,7 +218,7 @@ class Grade(models.Model):
     notes = models.CharField(max_length=516, blank=True)
 
     #dependant on grading system type
-    grade_value = models.IntegerField(default=0, blank=False) #used for point/percent calcultions if point systems are used
+    grade = models.IntegerField(default=0, blank=False) #used for point/percent calcultions if point systems are used
     grade_letter = models.CharField(default='none', max_length=12, blank=False) #used for calculating letter grade values
     
     timestamp = models.DateTimeField(auto_now_add=True)
@@ -247,18 +247,20 @@ class CourseGrade(models.Model):
     student = models.ForeignKey('Student', on_delete=models.CASCADE, related_name='courseGrade_student')
 
     #required fields
-    type = models.BooleanField(default=1, blank=False) #diferentiates if this is aggrigate entry for 0=year or 1=semester
-    year = models.IntegerField(default=0, blank=False) #used for storing final score
-    semester = models.IntegerField(default=1, blank=False) #used for storing semester final scores
+    type = models.BooleanField(default=1, blank=True) #diferentiates if this is aggrigate entry for 0=year or 1=semester
+    year = models.IntegerField(default=0, blank=True) #used for storing final score
+    semester = models.IntegerField(default=1, blank=True) #used for storing semester final scores
     #dependant on grading system type
-    grade_value = models.IntegerField(default=0, null=False, blank=False) #used for point/percent calcultions if point systems are used
-    grade_letter = models.CharField(default='none', max_length=12, blank=False) #used for calculating letter grade values
+    grade = models.IntegerField(default=0, null=False, blank=True) #used for point/percent calcultions if point systems are used
+    max_score  = models.IntegerField(default=0, null=True, blank=True)
+    grade_percent = models.DecimalField(decimal_places=2, max_digits=5, default=0, null=True, blank=True)
+    grade_letter = models.CharField(default='none', max_length=12, blank=True) #used for calculating letter grade values
     
     timestamp = models.DateTimeField(auto_now_add=True)
 
     #display settings in site admin backend
     def __str__(self):
-        return f"{self.student + ' ' + self.course + ' year' + self.year + ' semester' + self.semester}"
+        return f"{self.student }"
 
     def serializer(self):
         return {

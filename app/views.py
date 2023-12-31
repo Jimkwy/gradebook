@@ -2,9 +2,10 @@
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import JsonResponse
-from django.shortcuts import HttpResponse, HttpResponseRedirect, render
+from django.shortcuts import HttpResponse, HttpResponseRedirect, render, redirect
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
+from itertools import chain
 
 from .user import User
 from .models import School, Course, Student, Attendance, Assignment, Grade, CourseGrade
@@ -621,6 +622,10 @@ def enroll(request, course_code=None, student_code=None):
                         student.course_count = student.courses.count()
                         student.save()
                         course.students.add(student)
+                        courseGrade = CourseGrade()
+                        courseGrade.course = course
+                        courseGrade.student = student
+                        courseGrade.save()
                     except:
                         continue
                 course.course_count = course.students.count()
@@ -637,6 +642,10 @@ def enroll(request, course_code=None, student_code=None):
                         course.student_count = course.students.count()
                         course.save()
                         student.courses.add(course)
+                        courseGrade = CourseGrade()
+                        courseGrade.course = course
+                        courseGrade.student = student
+                        courseGrade.save()
                     except:
                         continue
                 student.course_count = student.courses.count()
@@ -750,28 +759,26 @@ def drop(request, course_code=None, student_code=None):
 #gradebook views
 @csrf_exempt
 @login_required
-def gradebook(request, course_id):
+def gradebook(request, course_code):
     #initialize user
     user = request.user
     #authenticate if user is related to school then pull course object
     if user.school and user.is_teacher:
-        course = Course.objects.get(code=course_id, school=user.school)
+        course = Course.objects.get(code=course_code, school=user.school)
         if course.teacher == user or user.is_admin:
             #load students and assignments
             students = course.students.all()
             assignments = Assignment.objects.filter(course=course)
             #pull teacher courses for nav
             courses = Course.objects.filter(teacher=user).order_by('start_time')
-            grades = []
-            for student in students:
-                grade = student.grades.all()
-                if grade:
-                    grades.append(grade)
+            grades = Grade.objects.filter(assignment__in=assignments)
+            courseGrades = CourseGrade.objects.filter(course=course)
             return render(request, "app/gradebook/gradebook.html",{'course':course,
                                                          'students':students,
                                                          'assignments':assignments,
                                                          'courses':courses, 
-                                                         'grades':grades})
+                                                         'grades':grades,
+                                                         'courseGrades': courseGrades})
         return HttpResponseRedirect(reverse("courses"))
     return HttpResponseRedirect(reverse("index"))
 
@@ -804,9 +811,9 @@ def assignment(request, course_code, assignment_id=None):
                         # save the form data to model
                         assignment_model = form.save(commit=False)
                         assignment_model.course = course
-                        assignment_model.save()       
+                        assignment_model.save()  
         
-                return HttpResponseRedirect(reverse("courses"))
+                return redirect("gradebook", course_code=course.code)
                     
             #if GET check if user has a related school
             else:
@@ -839,7 +846,7 @@ def assignment(request, course_code, assignment_id=None):
 
 @csrf_exempt
 @login_required
-def addGrade(request, assignment_id, student_code, grade_id=None):
+def addGrade(request, assignment_id, student_code):
     #initialize user
     user=request.user
     #check for permissions
@@ -849,18 +856,18 @@ def addGrade(request, assignment_id, student_code, grade_id=None):
         assignment = Assignment.objects.get(id=assignment_id)
         #pull course for redirect
         course = assignment.course
-        print(assignment)
         if request.method == 'POST':
             grade = ()
-            if grade_id != None:
-                grade = Grade.objects.get(id=grade_id)
+            try:
+                grade = Grade.objects.get(student=student, assignment=assignment)
                 form = GradeForm(request.POST, instance=grade)
                 # check if form data is valid
                 if form.is_valid():
                     # save the form data to model
-                    form.save()       
+                    form.save()
+                return redirect("gradebook", course_code=course.code)
 
-            else:
+            except:
                 #initalize
                 form = GradeForm(request.POST)
                 # check if form data is valid
@@ -870,20 +877,27 @@ def addGrade(request, assignment_id, student_code, grade_id=None):
                         grade_model.assignment = assignment
                         grade_model.student = student
                         grade_model.save()
-                        return HttpResponseRedirect(reverse("gradebook", course.code))
+                        student.grades.add(grade_model)
+                        student.save()
+                        courseGrade = CourseGrade.objects.get(course=course, student=student)
+                        courseGrade.grade = courseGrade.grade + grade_model.grade
+                        courseGrade.max_score = courseGrade.max_score + assignment.max_score
+                        courseGrade.grade_percent = (courseGrade.grade / courseGrade.max_score) * 100
+                        courseGrade.save()
+                        return redirect("gradebook", course_code=course.code)
                     
                     except:
-                        return HttpResponseRedirect(reverse("index"))
+                        return redirect("gradebook", course_code=course.code)
 
                 else:
                     return HttpResponseRedirect(reverse("index"))
                     
         #if GET check if user has a related school
         else:
-            if grade_id != None:
+            try:
+                grade = Grade.objects.get(student=student, assignment=assignment)
                 #generate form
                 edit = True
-                grade = Grade.objects.get(id=grade_id, student=student)
                 form = GradeForm(instance=grade)
                 #pull teacher courses for nav
                 courses = Course.objects.filter(teacher=user).order_by('start_time')
@@ -892,7 +906,7 @@ def addGrade(request, assignment_id, student_code, grade_id=None):
                                                                     'student': student,
                                                                         'assignment':assignment,
                                                                         'courses':courses})
-            else:
+            except:
                 #generate form with school object to limit teacher options to school related users
                 form = GradeForm()
                 #pull teacher courses for nav
@@ -905,7 +919,6 @@ def addGrade(request, assignment_id, student_code, grade_id=None):
     else:           
         #if all checks fail. Redirect.
         return HttpResponseRedirect(reverse("index"))
-    return HttpResponseRedirect(reverse("index"))
 #API views
 #all api routes are temporary csrf_exempt for the sake of functionality testing
 
