@@ -6,8 +6,11 @@
 {% endblock title %}
 {% block body %}
 <body>
-    <h4>If you were given an access code from your school admin. Enter it below.</h4>
-    <div id="joinSchool"  class="course-row">
+    <h4>Please select if you are joining a school or creating a new school</h4>
+    <button onclick="load_view('joinSchool')">Join School</button>
+    <button onclick="load_view('newSchool')">Create a New School</button>
+    <div id="joinSchool"  class="course-row view" style="display:none">
+        <h4>If you were given an access code from your school admin. Enter it below.</h4>
         <div>
         <form id="join_form" action="{% url 'setupSchool' 'join' %}"method="POST">
             <h4>Enter your schools private access code to join.</h4>
@@ -17,8 +20,8 @@
         <p><small>Please Use the access code sent to you by your school or organizations administration. If you ecounter any errors please contact your school administration or check out our FAQ.</small></p>
     </div>
     </div>
-    <h4>If you are setting up a new school, enter the schools information below.</h4>
-    <div id="newSchool" class="course-row">
+    <div id="newSchool" class="course-row view" style="display:none">
+        <h4>If you are setting up a new school, enter the schools information below.</h4>
         <div>
         <form id="newSchool_form" action="{% url 'setupSchool' 'newschool' %}" method="POST">
             <h4>New School Submition</h4>

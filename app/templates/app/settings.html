@@ -1,3 +1,4 @@
+
 {% extends 'app/layout.html' %}
 {% load static %}
 
@@ -6,19 +7,29 @@
 {% endblock title %}
 {% block body %}
 <body>
-    <h4>SETTINGS PAGE</h4>
+    <h4>School Settings</h4>
         <hr>
         <h4>School</h4>
-        <h4>You are currently associated with {{user.school}}. </h4>
+        <h4>You are currently associated with: {{user.school}}. </h4>
+        <hr>
+        <h4>Please use the codes below to share with other users to join the school.</h4><hr>
+        Admin Code:{{school.admin_code}}<hr>
+        Teacher Code: {{school.teacher_code}}<hr>
         {% if user == user.school.master %}
+        <h4>If you would like to close the school, click the link below</h4>
+        <h4 style="color:rgb(173, 16, 16)">Warning! This cannot be undone!</h4>
+        <hr>
         <button type="link">
             <a id="delete_school" href="{% url 'deleteSchool' %}">Delete School</a>
         </button>
         {% else %}
+        <h4>If you would like to leave the school, click the link below</h4>
+        <h4 style="color:rgb(173, 16, 16)">Warning! This cannot be undone!</h4>
+        <hr>
         <button type="link">
             <a id="leave_school" href="{% url 'leaveSchool' %}">Leave School</a>
         </button>
         {% endif %}
-        <hr>
+        
 </body>
 {% endblock %}

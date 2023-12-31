@@ -43,12 +43,12 @@ def settings(request):
     if user.school:
         #pull teacher courses for nav
         courses = Course.objects.filter(teacher=user).order_by('start_time')
-        
+        school = user.school
         if user == user.school.master:
             admins = user.school.admins.all()
-            return render(request, "app/settings.html", {'courses': courses})
+            return render(request, "app/settings.html", {'courses': courses, 'school':school})
         else: 
-            return render(request, "app/settings.html", {'courses': courses})
+            return render(request, "app/settings.html", {'courses': courses, 'school':school})
     else: 
         return HttpResponseRedirect(reverse("setupSchool"))
 
