@@ -6,6 +6,7 @@
 {% endblock title %}
 {% block body %}
 <body>
+    <h4>{{course.name}}, {{course.start_time}} - {{course.end_time}}</h4>
     <button>
         <a href="{% url 'addAssignment' course.code %}">Add assignment</a>
     </button>
